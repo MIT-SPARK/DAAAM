@@ -8,10 +8,24 @@ from time import localtime
 import spark_dsg as sdsg
 from spark_dsg import SceneGraphNode
 from scipy.spatial.transform import Rotation
-import traceback
-from pathlib import Path
 
 from daaam.scene_understanding.models import ObjectInfo, ObjectData
+
+
+# CODa sequence start times (Unix epoch seconds). Used to convert
+# absolute on-disk timestamps to recording-relative seconds.
+CODA_START_TIMES: Dict[int, float] = {
+	0: 1673884185.589118,
+	3: 1673985684.662767,
+	4: 1674087704.955325,
+	6: 1674764557.790565,
+	16: 1675881269.033398,
+	21: 1676052119.125703,
+	22: 1676064138.910544,
+}
+
+
+# scene graph helpers
 
 def get_time_texas_from_sdsg_timestamp(timestamp: timedelta) -> float:
 	"""Convert S-DSG timestamp (seconds) to nanoseconds."""
@@ -34,12 +48,9 @@ def retrieve_objects_from_scene_graph(scene_graph: sdsg.DynamicSceneGraph) -> Di
 
 	objects_data = {}
 	for obj in objects:
-		try: 
-			data = ObjectData.from_scene_graph_node(obj)
-			objects_data[data.object_info.id] = data
-		except Exception as e:
-			print(f"Error processing object {obj.id}: {e}")
-		
+		data = ObjectData.from_scene_graph_node(obj)
+		objects_data[data.object_info.id] = data
+
 	return objects_data
 
 

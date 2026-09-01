@@ -95,36 +95,32 @@ class Tool(ABC):
 		pass  # Default no-op implementation
 
 	def _get_current_robot_position(self) -> Optional[np.ndarray]:
-		"""Get current robot position from latest agent node in scene graph.
+		"""Get current robot position from latest agent node in scene graph."""
+		pos, _ = self._get_current_robot_state()
+		return pos
 
-		This corresponds to the 'current location' mentioned in questions.
-		Returns the position of the most recent agent pose node based on timestamp.
+	def _get_current_robot_state(self) -> Tuple[Optional[np.ndarray], Optional[float]]:
+		"""Return (latest_position, latest_timestamp) from the agent layer (layer 2, prefix 97).
 
-		Returns:
-			Position [x, y, z] as numpy array, or None if unavailable.
+		The "current" robot state corresponds to the latest agent pose node by metadata
+		timestamp — used both as the answer to "where am I" / "what time is it" and as
+		the upper bound for temporal-causality filters (events later than this haven't
+		happened yet at the question's reference time).
 		"""
 		if self.scene_graph is None:
-			return None
-
-		# Check if agent layer exists (layer 2, prefix 97)
+			return None, None
 		if not self.scene_graph.has_layer(2, 97):
-			return None
+			return None, None
 
-		agent_layer = self.scene_graph.get_layer(2, 97)
-
-		# Find latest agent node by timestamp
 		latest_node = None
-		latest_timestamp = -float('inf')
-
-		for node in agent_layer.nodes:
-			metadata = node.attributes.metadata.get()
-			node_timestamp = metadata.get('timestamp')
-
-			if node_timestamp is not None and node_timestamp > latest_timestamp:
-				latest_timestamp = node_timestamp
+		latest_ts = -float("inf")
+		for node in self.scene_graph.get_layer(2, 97).nodes:
+			meta = node.attributes.metadata.get()
+			ts = meta.get("timestamp")
+			if ts is not None and ts > latest_ts:
+				latest_ts = ts
 				latest_node = node
 
 		if latest_node is None:
-			return None
-
-		return latest_node.attributes.position
+			return None, None
+		return np.array(latest_node.attributes.position), float(latest_ts)

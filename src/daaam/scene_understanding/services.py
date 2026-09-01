@@ -9,9 +9,11 @@ from pydantic import BaseModel
 
 import spark_dsg as sdsg
 import numpy as np
+import torch
 from PIL import Image
 
 from daaam.scene_understanding.config import SceneUnderstandingConfig
+from daaam.utils.embedding import CLIPHandler, SentenceEmbeddingHandler
 from daaam.utils.logging import PipelineLogger, get_default_logger
 from daaam.scene_understanding.models import Response
 from daaam.scene_understanding.interfaces import (
@@ -31,11 +33,22 @@ from daaam.scene_understanding.providers import (
 
 class SceneUnderstandingAgent(SceneUnderstandingInterface):
 	"""Service for handling scene understanding with tool calling."""
-	
-	def __init__(self, config: SceneUnderstandingConfig, logger: Optional[PipelineLogger] = None):
+
+	def __init__(
+		self,
+		config: SceneUnderstandingConfig,
+		logger: Optional[PipelineLogger] = None,
+		clip_handler: Optional[CLIPHandler] = None,
+		sentence_handler: Optional[SentenceEmbeddingHandler] = None,
+	):
+		"""Build a scene-understanding agent.
+
+		If clip_handler / sentence_handler are passed, the agent reuses them instead
+		of constructing fresh ones — used by multi-sequence eval to share heavy models
+		across per-sequence agents.
+		"""
 		super().__init__(config, logger)
 
-		# Initialize provider-aware client and tool store with configuration
 		self.provider = detect_provider(config.model_name)
 		self.client = create_client(self.provider)
 		self.tool_registry = create_default_tool_registry(
@@ -43,24 +56,24 @@ class SceneUnderstandingAgent(SceneUnderstandingInterface):
 			tools_to_include=config.available_tools
 		)
 
-		# Create shared embedding handlers (expensive models, load once)
-		import torch
-		from daaam.utils.embedding import CLIPHandler, SentenceEmbeddingHandler
+		if clip_handler is None and config.tool_config.clip_model_name and config.tool_config.clip_backend:
+			clip_handler = CLIPHandler(
+				model_name=config.tool_config.clip_model_name,
+				backend=config.tool_config.clip_backend,
+			)
+		if sentence_handler is None:
+			sentence_handler = SentenceEmbeddingHandler(
+				model_name=config.tool_config.sentence_embedding_model_name,
+				device="cuda" if torch.cuda.is_available() else "cpu",
+			)
 
-		self.clip_handler = None
-		if config.tool_config.clip_model_name and config.tool_config.clip_backend:
-			self.clip_handler = CLIPHandler(model_name=config.tool_config.clip_model_name, backend=config.tool_config.clip_backend)
+		self.clip_handler = clip_handler
+		self.sentence_handler = sentence_handler
 
-		self.sentence_handler = SentenceEmbeddingHandler(
-			model_name=config.tool_config.sentence_embedding_model_name,
-			device="cuda" if torch.cuda.is_available() else "cpu"
-		)
-
-		# Inject shared handlers into all tools
 		self.tool_registry.set_embedding_handlers(self.clip_handler, self.sentence_handler)
 
-		# Don't set scene graph here - it's empty! Wait for update_scene_graph() to be called
-		
+		# Scene graph stays empty until update_scene_graph() is called.
+
 
 	def answer_query(self, ResponseFormat: type, query: str, image: Optional[Any] = None, **kwargs) -> Tuple[Response, Dict[str, Any]]:
 		"""
@@ -133,7 +146,9 @@ class SceneUnderstandingAgent(SceneUnderstandingInterface):
 					result = self.tool_registry.call_tool(item.name, item.arguments)
 
 					text_result = result
+					images_payload = None
 					if isinstance(result, dict) and "_images" in result:
+						images_payload = result["_images"]
 						text_result = {k: v for k, v in result.items() if k != "_images"}
 
 					messages.append({
@@ -141,6 +156,22 @@ class SceneUnderstandingAgent(SceneUnderstandingInterface):
 						"call_id": item.call_id,
 						"output": json.dumps(round_floats(text_result))
 					})
+
+					if images_payload:
+						# Responses API user-message form. image_url is a data URL string,
+						# distinct from the older chat-completions nested object form.
+						image_content: List[Dict[str, Any]] = [
+							{"type": "input_text", "text": f"Images returned by {item.name}:"}
+						]
+						for img in images_payload:
+							image_content.append({
+								"type": "input_image",
+								"image_url": f"data:image/jpeg;base64,{img['base64']}"
+							})
+							label = img.get("label", "")
+							if label:
+								image_content.append({"type": "input_text", "text": label})
+						messages.append({"role": "user", "content": image_content})
 
 					iteration_data["tool_results"] = text_result
 
