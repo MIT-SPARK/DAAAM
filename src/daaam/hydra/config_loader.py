@@ -29,9 +29,9 @@ def load_pseudo_labelspace(labelspace_path: pathlib.Path) -> Dict[str, Any]:
 		
 	# Ensure required fields exist
 	if "total_semantic_labels" not in config:
-		config["total_semantic_labels"] = 10000
+		config["total_semantic_labels"] = 30000
 	if "object_labels" not in config:
-		config["object_labels"] = list(range(10000))
+		config["object_labels"] = list(range(30000))
 	if "dynamic_labels" not in config:
 		config["dynamic_labels"] = []
 	if "invalid_labels" not in config:
@@ -44,7 +44,7 @@ def load_hydra_config(
 	hydra_config_path: str,
 	labelspace_path: Optional[str] = None,
 	labelspace_colors: Optional[str] = None,
-	bounding_box_type: str = "AABB",
+	bounding_box_type: str = "OBB",
 ) -> Optional[Dict[str, Any]]:
 	"""
 	Load Hydra configuration from direct file paths.
