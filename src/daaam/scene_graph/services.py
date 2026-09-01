@@ -33,11 +33,12 @@ from daaam.pipeline.models import (
 class SceneGraphService:
 	"""Service for handling scene graph corrections and updates."""
 
-	def __init__(self, semantic_config_path: Path, labelspace_colors_path: Optional[Path] = None, logger: Optional[PipelineLogger] = None, defer_dsg_processing: bool = False, enable_background_objects: bool = True):
+	def __init__(self, semantic_config_path: Path, labelspace_colors_path: Optional[Path] = None, logger: Optional[PipelineLogger] = None, defer_dsg_processing: bool = False, enable_background_objects: bool = True, hydra_dsg_path: str = ""):
 		self.logger = logger or get_default_logger()
 		self.scene_graph = DynamicSceneGraph()
 		self.scene_graph_is_set = False
 		self.defer_dsg_processing = defer_dsg_processing
+		self.hydra_dsg_path = Path(hydra_dsg_path) if hydra_dsg_path else None
 		self.deferred_updates = []  # Store (binary, full_update, deleted_nodes) tuples
 
 		self.corrections: Dict[int, ObjectAnnotation] = {}
@@ -60,15 +61,19 @@ class SceneGraphService:
 		self.labelspace_colors_path = labelspace_colors_path
 
 		# load semantic configuration and color maps (autogenerating if paths do not exist)
-		if not semantic_config_path.exists():
-			self.logger.warning(f"Semantic config not found: {semantic_config_path}, creating with default labels")
-			# hack around Hydra: create dict of empty pseudolabels that get assigned to
-			# semantic descriptions asynchronously. Hydra will construct DSG based on
-			# unlabeled primitives. 
-			# TODO: if hack is kept, add logic to increase size of label map for more 
-			# than 10000 labels
-			# TODO: alternatively find better way to handle this
-			create_label_map(str(semantic_config_path), 10000)
+		# create_label_map generates both YAML and CSV from the same base path,
+		# so regenerate both if either file is missing.
+		colors_path = Path(labelspace_colors_path) if labelspace_colors_path else None
+		if not semantic_config_path.exists() or (colors_path and not colors_path.exists()):
+			missing = []
+			if not semantic_config_path.exists():
+				missing.append(f"YAML ({semantic_config_path})")
+			if colors_path and not colors_path.exists():
+				missing.append(f"CSV ({colors_path})")
+			self.logger.warning(f"Label files missing: {', '.join(missing)} — creating with default pseudo labels")
+			# TODO: if hack is kept, add logic to increase size of label map for more
+			# than 30000 labels
+			create_label_map(str(semantic_config_path), 30000)
 		self.semantic_config = load_semantic_config(semantic_config_path)
 		self.color_map = load_color_map(labelspace_colors_path)
 		self.logger.info(
@@ -743,11 +748,29 @@ class SceneGraphService:
 			
 			return self.latest_corrected_dsg.copy()
 		
+	def load_hydra_dsg(self) -> bool:
+		"""Load Hydra's saved DSG from disk (includes active window objects extracted at shutdown)."""
+		assert self.hydra_dsg_path is not None
+		dsg_json = self.hydra_dsg_path / "backend" / "dsg.json"
+		if not dsg_json.exists():
+			self.logger.warning(f"Hydra DSG not found at {dsg_json}")
+			return False
+		with self.scene_graph_lock:
+			self.scene_graph = DynamicSceneGraph.load(str(dsg_json))
+			self.scene_graph_is_set = True
+		n_objects = len([n for n in self.scene_graph.get_layer(DsgLayers.OBJECTS).nodes])
+		self.logger.info(f"Loaded Hydra DSG from {dsg_json} ({n_objects} objects)")
+		return True
+
 	def save_data(self, output_save_dir: Path) -> None:
 		"""Save DSG and corrections to files."""
-		# Apply any deferred updates first
+		# Prefer topic-based DSG (deferred updates) over disk loading
 		if self.defer_dsg_processing:
 			self.apply_deferred_updates()
+		elif self.hydra_dsg_path:
+			# Fallback: load from disk (Python path without ROS topics)
+			if self.load_hydra_dsg():
+				self.apply_corrections()
 
 		label_names = []
 
