@@ -19,7 +19,7 @@ MEDIUM_02da6f10-4ce1-4eb3-a416-c4522e9c8133,0,Where is the closest place to sit?
 MEDIUM_9595c924-7840-4964-8bd0-d6e3080bcd65,0,When did you first enter the building?,7:56:34,time,,[minutes] ago,temporal,
 MEDIUM_11801608-016d-4367-8247-4a885afef25d,0,Where did you see the sculpture with the hanging boats?,8:00:50,position,,[position],spatial,[-48.563694 68.33578 0.0]
 MEDIUM_022ee3b7-38a6-4a36-9f48-fa656ea3cf21,0,What was the color of the couches near where I entered the building?,7:56:59,text,The couches were red.,,environmental,
-MEDIUM_b5b98312-f881-422d-b2cb-4b9c5696948b,0,When did you cross the brick street?,8:00:07,time,,[minutes] ago,temporal,
+MEDIUM_b5b98312-f881-422d-b2cb-4b9c5696948b,0,When did you last cross the brick street?,8:00:07,time,,[minutes] ago,temporal,
 MEDIUM_c6c87c47-04c3-44ca-a1be-053153b740c5,0,Where is the nearest bike rack that is not empty?,8:02:04,position,,[position],spatial,[-11.568605 44.14943 -1.4201697]
 MEDIUM_254c3f52-e4ed-4828-ba85-42a500ff8676,0,When were you in the atrium with the red couches?,7:57:00,time,,[minutes] ago,temporal,
 SHORT_39a4eb19-b64e-4289-abcf-92ea6c3debba,0,How long have you been outside?,"07:59:00,07:59:54",duration,I have been outside for around 0.9 minutes,1,temporal reasoning,
@@ -42,12 +42,12 @@ SHORT_21548fa5-15ca-4f06-923e-a99b0fb2253a,0,Are you stopped in a loading zone r
 16_LONG_ef1e8b40-f29d-4830-9fdf-91a996741b8e,16,When did you see the pride flag?,10:48:05,time,,,,
 16_LONG_dbfc9ff7-cb76-4a6b-975f-e0ed40b1bd3f,16,Where can I find a place to sit across the flights of stairs I last saw?,10:58:38,position,,[position],spatial,[21.27 91.12 0.34]
 16_LONG_2af098fa-6c27-4eb9-91a7-87e1bb14895a,16,Can you take me to the bank?,10:46:24,position,,[position],spatial,[387.78583 40.541706 0.0]
-16_MEDIUM_7bee74a4-af1e-4fe9-9eb0-4e74d105e641,16,When did you pass the stop sign?,10:59:40,time,,,,
+16_MEDIUM_7bee74a4-af1e-4fe9-9eb0-4e74d105e641,16,When did you last pass the stop sign?,10:59:40,time,,,,
 16_MEDIUM_6135dc24-4444-40f6-8082-a2575f990a72,16,What color was the semi-truck?,10:35:01,text,The semi-truck was red,,,
 16_MEDIUM_122e73d4-c202-4773-bb8e-140c54bcc801,16,Was the robot driving on the left side of the sidewalk?,10:55:01,binary,,No,,
 16_MEDIUM_3c00c2a5-521a-4e03-8a51-0f10e2536c6c,16,Was the robot driving on the left side of the yellow sidewalk?,11:00:17,binary,,Yes,,
 16_MEDIUM_1aa16770-2f02-4260-9e8f-9835e55c4fc8,16,Can you take me to where the cones were blocking parking?,10:51:02,position,,[position],spatial,[275.7725 35.147133 11.109982]
-16_MEDIUM_161bac22-b5a7-4737-b544-c463e7fb82af,16,When did you cross the street?,10:42:07,time,,,,
+16_MEDIUM_161bac22-b5a7-4737-b544-c463e7fb82af,16,When did you last cross the street?,10:42:07,time,,,,
 16_MEDIUM_b44f6dae-918f-4210-8850-c294ec3ffef4,16,Can you take me to the intersection the golf cart stopped at?,10:59:40,position,,[position],spatial,[-49.350174 89.23866 -0.18653454]
 16_MEDIUM_16ae797a-fc47-43cf-a518-8888c7f7195b,16,Did it rain outside?,10:53:19,binary,,Yes,,
 16_MEDIUM_78f0b5ee-364e-4ea3-82e3-9708f9e96c24,16,Where is the metal boat sculpture?,10:36:13,position,,[position],spatial,[-48.563694 68.33578 0.0]
@@ -62,16 +62,16 @@ SHORT_21548fa5-15ca-4f06-923e-a99b0fb2253a,0,Are you stopped in a loading zone r
 16_SHORT_75b4a1db-dc6d-40c7-96b9-ba45bf611957,16,What is the name of the street you crossed?,10:55:50,text,I crossed Inner Campus Dr.,,,
 16_SHORT_c20410c1-b187-4759-94e2-e47287a25574,16,Is the weather sunny?,10:53:18,binary,,No,,
 16_SHORT_4096b839-974b-457f-9fdf-e0158f29f60a,16,Where did you see the rainbow flag?,10:48:05,position,,[position],spatial,[364.91 -24.84 12.11]
-21_LONG_bf58d6a5-cfa1-41fa-a1db-881134770eec,21,Can you take me to the bike rack closest to the nearby yellow police pole?,10:11:00,position,,[position],spatial,[248.05 71.39 13.94]
+21_LONG_bf58d6a5-cfa1-41fa-a1db-881134770eec,21,Can you take me to the bike rack closest to the nearest yellow police pole?,10:11:00,position,,[position],spatial,[248.05 71.39 13.94]
 21_LONG_af512a63-3353-48eb-90cb-21b97b1dff92,21,Where are the closest newspaper stands near a crosswalk?,10:24:46,position,,[position],spatial,[264.83 49.95 14.39]
 21_LONG_c14eb6b3-e13e-4204-abf5-1f8bd8cae969,21,Where is the nearest yellow police pole?,10:17:09,position,,[position],spatial,[253.32396 76.51804 13.003629]
 21_LONG_b2577b8f-845c-4730-9a5c-971223bd09da,21,How long were you waiting at the intersection?,"10:23:39,10:24:24",duration,I was waiting at the intersection for .75 minutes,0.75,temporal reasoning,
 21_LONG_57a97e86-eb00-439c-8776-71f8645301b6,21,When did you walk by the Texas crosswalk entrance?,10:11:59,time,,[minutes] ago,temporal,
 21_LONG_c92484a7-c88a-4bdf-903c-83b7c27df536,21,Can you take me to a bike rack closest to the Texas crosswalk entrance?,10:12:38,position,,[position],spatial,[252.37 72.11 13.33]
-21_LONG_bf3894e7-92bc-4701-9c9c-96f0b480b899,21,When did you drive by the parking lot?,10:20:12,time,,[minutes] ago,temporal,
+21_LONG_bf3894e7-92bc-4701-9c9c-96f0b480b899,21,When did you last drive by the parking lot?,10:20:12,time,,[minutes] ago,temporal,
 21_LONG_55ac5247-2ce2-4bef-8b87-ba95cf82e58a,21,Did you drive by the Wells Fargo today?,10:24:56,binary,"Yes, I did drive by the Wells Fargo.",Yes,descriptive,
 21_LONG_5e61c6b0-f759-4a1b-b8dd-db21964d45f3,21,What does the small building by the crosswalk say?,10:12:00,text,The building says TEXAS,,environmental,
-21_LONG_66ac82a9-05dd-4b8d-b649-4136aa87c392,21,When did you see the white van on the brown road?,10:04:41,time,,[minutes] ago,temporal,
+21_LONG_66ac82a9-05dd-4b8d-b649-4136aa87c392,21,When did you last see the white van on the brown road?,10:04:41,time,,[minutes] ago,temporal,
 21_MEDIUM_8b58e59b-348c-4946-875c-9fc11ea5d3c0,21,What color was the car that past you at the last intersection?,10:18:28,text,The car was blue,,environmental,
 21_MEDIUM_c781442e-1c1c-4bc4-9849-1fcb476999f8,21,How long did it take you to drive along the busy road?,"10:21:35, 10:23:25",duration,It took me 1.8 minutes to drive down the busy road,1.8,,
 21_MEDIUM_f4f9e877-351e-4721-b43c-f7348acf027a,21,Can you take me to the parking lot?,10:20:12,position,,[position],spatial,[330.69794 -43.086773 11.104892]
@@ -81,17 +81,17 @@ SHORT_21548fa5-15ca-4f06-923e-a99b0fb2253a,0,Are you stopped in a loading zone r
 21_MEDIUM_10b1452d-2230-4f7e-9e23-9253ce738c1e,21,Did the parking lot near the intersection have empty spaces?,10:20:12,binary,,Yes,,
 21_MEDIUM_18ebe275-8985-4af8-8030-3d125dc48c00,21,Was the sidewalk very busy?,10:14:08,binary,,No,,
 21_MEDIUM_75bb8e35-542b-4c39-9021-26d234d2b796,21,Can you find me somewhere to sit near the stairs?,10:06:10,position,,[position],spatial,[79.456245 91.021805 3.39]
-21_MEDIUM_dcee9ce9-55da-4a13-ab47-1df53edb2e1e,21,When did you cross the street?,10:18:34,time,,[minutes] ago,temporal,
+21_MEDIUM_dcee9ce9-55da-4a13-ab47-1df53edb2e1e,21,When did you last cross the street?,10:18:34,time,,[minutes] ago,temporal,
 21_SHORT_9819e8f8-904b-4da8-ac44-7b225e6baaad,21,Is it cloudy today?,10:16:03,binary,,Yes,,
 21_SHORT_717f5d70-12e2-423a-a8aa-b64b5428150c,21,Can you take me to the nearest bike rack?,10:09:50,position,,[position],spatial,[182.77 77.75 9.19]
 21_SHORT_e7dd32e5-1d55-46fb-a87a-88fe7e962fc5,21,Was there traffic on the road?,10:22:00,binary,,Yes,,
 21_SHORT_45f1a060-adcd-402f-b01a-7cf72e3272bd,21,When did you last see someone?,10:19:00,time,,[minutes] ago,temporal,
-21_SHORT_d6c287f2-6320-409f-a42e-02d48358eaed,21,Where was the golf cart?,10:27:12,position,,[position],spatial,[283.04 72.83 15.79]
+21_SHORT_d6c287f2-6320-409f-a42e-02d48358eaed,21,Where was the nearest golf cart?,10:27:12,position,,[position],spatial,[283.04 72.83 15.79]
 21_SHORT_2b9ac208-4cba-4a9f-849e-6ad8bd5c616d,21,Was there anyone sitting on the stairs?,10:31:08,binary,,No,,
 21_SHORT_bea0442d-3c89-4d30-91e9-d5174901ed80,21,Can you take me to the nearest scooter?,10:30:57,position,,[position],spatial,[121.29 86.06 5.11]
 21_SHORT_fdecc7da-6eab-45d0-bfe7-94b71f968479,21,Was the man with the backpack walking away towards the van?,10:04:59,binary,,Yes,,
 21_SHORT_db87275e-074a-4e71-b625-a68c4391220f,21,Did other people cross the street with me?,10:29:58,binary,,Yes,,
-21_SHORT_56267d72-9c61-4adb-8081-1c93f3d28014,21,When did you cross the street?,10:30:02,time,,[minutes] ago,temporal,
+21_SHORT_56267d72-9c61-4adb-8081-1c93f3d28014,21,When did you last cross the street?,10:30:02,time,,[minutes] ago,temporal,
 22_LONG_e746f4cf-92ec-474f-8a7a-507a95f5f539,22,When did you enter the building?,13:34:27,time,,[minutes] ago,temporal,
 22_LONG_3a94843e-7200-49b0-84f4-aea31fdbc2f5,22,Can you take me to the elevator?,13:34:33,position,,[position],spatial,[-76.66 358.19 1.08]
 22_LONG_e96335e8-458e-4330-865c-d4901362d63e,22,What is the name of the building you entered?,"13:34:03,13:34:27",text,The name of the building I entered is the Student Activity Center,,,
@@ -127,7 +127,7 @@ SHORT_21548fa5-15ca-4f06-923e-a99b0fb2253a,0,Are you stopped in a loading zone r
 3_LONG_d7732615-983f-4dc0-8c52-1437b98b98ed,3,Did I go outdoor with trees?,12:14:38,binary,,Yes,environmental,
 3_LONG_3a877fd4-beaf-4f2f-b1dc-9d461707dd2d,3,Where did I see a horse sculpture?,12:17:14,position,,[position],spatial,[-97.73148 170.10974 -1.9537449]
 3_LONG_73204feb-ee1c-4567-a836-fe2db05bfb23,3,Where did I see over 5 tables with people chatting there?,12:18:20,position,,[position],spatial,[-95.40 203.18 -0.59]
-3_LONG_fda7eae1-1531-42b5-be38-ed48540060a2,3,When did you see over 10 bikes?,12:24:10,time,,,temporal,
+3_LONG_fda7eae1-1531-42b5-be38-ed48540060a2,3,When did you last see over 10 bikes?,12:24:10,time,,,temporal,
 3_LONG_cd5d197f-b393-443e-8531-6e04ad2fe37d,3,when did you exit the first building?,12:12:07,time,,,temporal,
 3_LONG_3c7ff5ee-ef38-4096-8ee6-9d9feaf9e9b2,3,did you see a car trying to park?,12:15:22,binary,,Yes,Reasoning,
 3_LONG_5213d6a7-151d-4beb-b9c3-4321c5fd59b8,3,Did you see a person holding a door for you to enter the building?,12:09:48,binary,,Yes,Reasoning,
@@ -139,7 +139,7 @@ SHORT_21548fa5-15ca-4f06-923e-a99b0fb2253a,0,Are you stopped in a loading zone r
 3_MEDIUM_2d60058c-1488-43dd-847c-d40bc1e2859f,3,Where did you last see a big wall art?,12:17:16,position,,[position],spatial,[-97.95 173.94 -0.33]
 3_MEDIUM_042f8517-6875-4364-accd-3096e1032efe,3,Did the women who opened the door for you also carry a water bottle?,12:16:12,binary,,Yes,spatial,
 3_MEDIUM_2d2b8344-6797-4a57-91c3-2efd1c43f517,3,Where did you last leave the building?,12:18:49,position,,[position],spatial,[-84.97 205.35 -1.50]
-3_MEDIUM_63f85e28-3f42-4aa6-bd96-21a414394ccf,3,When did you left the building?,12:18:49,time,,,temporal,
+3_MEDIUM_63f85e28-3f42-4aa6-bd96-21a414394ccf,3,When did you leave the building?,12:18:49,time,,,temporal,
 3_MEDIUM_ebc073aa-6f34-4206-9968-5e2f01fbbd2d,3,Did you see a building with blue glass wall?,12:13:06,binary,,Yes,spatial,
 3_MEDIUM_799afe7b-9226-4097-b14d-9cb91dee7a7d,3,Did you see a big plant in the building?,12:10:51,binary,,Yes,spatial,
 3_SHORT_81b4e8bd-348a-4326-a3df-b84a4a422b0e,3,Where did you see a parked van?,12:25:02,position,,[position],spatial,[-2.95 4.91 0.50]
@@ -205,7 +205,7 @@ SHORT_21548fa5-15ca-4f06-923e-a99b0fb2253a,0,Are you stopped in a loading zone r
 6_SHORT_0a24625a-bc44-4bab-8cc7-5e5fc31eb0b0,6,What was the color of the semi truck,12:37:54,text,yellow,yellow,object detection,
 6_SHORT_116cb2c2-8a03-4491-abe1-31b3c9b809bd,6,Did you see a building with large windows?,12:44:27,binary,yes,yes,environmental,
 6_SHORT_4b6d1d26-871c-43ee-9e86-98d1cf75a132,6,What was the color of shoes of the person who opened the door for you?,12:35:15,text,The person who opened the door for me was wearing white shoes,white,"environmental, spatial",
-6_SHORT_136fb34b-f179-47ec-98ba-16fe18a7f7f3,6,When did you pass through the yellow bollards?,12:43:15,time,,[minutes] ago,"temporal, environmental",
+6_SHORT_136fb34b-f179-47ec-98ba-16fe18a7f7f3,6,When did you last pass through the yellow bollards?,12:43:15,time,,[minutes] ago,"temporal, environmental",
 6_SHORT_aae33b1e-1d56-4e1a-a067-69b5ac3ec84a,6,Did you see any vehicles?,12:43:16,binary,"Yes, I saw vehicles.",yes,environmental,
 6_SHORT_2732dae9-2d64-4bc1-b36e-1adf39854dc3,6,Where is the nearest fire extinguisher?,12:33:22,position,,[position],"environmental, object detection",[-143.43 354.89 1.62]
 6_SHORT_47b97723-1b7f-4dee-9a57-b71c478299b6,6,What was written on the back of the trailer?,12:40:55,text,"The word ""Cotton"" was written on the back of the trailer",cotton,"environmental, text interpretation",
