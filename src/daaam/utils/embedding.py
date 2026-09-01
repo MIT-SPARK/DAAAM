@@ -1,5 +1,6 @@
 from typing import List, Optional, Any, Tuple, Dict, Union
 from dataclasses import dataclass
+import threading
 import torch
 import numpy as np
 from PIL import Image
@@ -36,6 +37,10 @@ class CLIPHandler:
 		self.pretrained = pretrained
 		self.backend = backend
 		self.logger = logger or get_default_logger()
+
+		# Serializes GPU/CUDA inference across threads so multi-sequence eval
+		# doesn't deadlock on shared model state.
+		self._lock = threading.Lock()
 
 		if backend == "pe":
 			self._init_perception_encoder(model_name)
@@ -79,10 +84,11 @@ class CLIPHandler:
 		Returns:
 			Array of image features [N, feature_dim], L2-normalized
 		"""
-		if self.backend == "pe":
-			return self._extract_image_features_pe(images, batch_size)
-		else:
-			return self._extract_image_features_openclip(images, batch_size)
+		with self._lock:
+			if self.backend == "pe":
+				return self._extract_image_features_pe(images, batch_size)
+			else:
+				return self._extract_image_features_openclip(images, batch_size)
 
 	def _extract_image_features_openclip(
 		self, images: List[Image.Image], batch_size: int
@@ -139,22 +145,23 @@ class CLIPHandler:
 		if not image_arrays:
 			return np.array([])
 
-		# Convert numpy arrays to PIL images and preprocess in batch
-		pil_images = [Image.fromarray(arr) for arr in image_arrays]
+		with self._lock:
+			# Convert numpy arrays to PIL images and preprocess in batch
+			pil_images = [Image.fromarray(arr) for arr in image_arrays]
 
-		# Process all images in a single batch for maximum efficiency
-		preprocessed = torch.stack([self.preprocess(img) for img in pil_images]).to(self.device)
+			# Process all images in a single batch for maximum efficiency
+			preprocessed = torch.stack([self.preprocess(img) for img in pil_images]).to(self.device)
 
-		# Single forward pass for all images (with autocast for PE)
-		if self.backend == "pe":
-			with torch.autocast("cuda"):
+			# Single forward pass for all images (with autocast for PE)
+			if self.backend == "pe":
+				with torch.autocast("cuda"):
+					features = self.model.encode_image(preprocessed)
+			else:
 				features = self.model.encode_image(preprocessed)
-		else:
-			features = self.model.encode_image(preprocessed)
-		features = features.cpu().numpy()
+			features = features.cpu().numpy()
 
-		# L2 normalize
-		return features / np.linalg.norm(features, axis=1, keepdims=True)
+			# L2 normalize
+			return features / np.linalg.norm(features, axis=1, keepdims=True)
 	
 	@torch.no_grad()
 	def extract_text_features(
@@ -169,10 +176,11 @@ class CLIPHandler:
 		Returns:
 			Array of text features [N, feature_dim], L2-normalized
 		"""
-		if self.backend == "pe":
-			return self._extract_text_features_pe(texts, batch_size)
-		else:
-			return self._extract_text_features_openclip(texts, batch_size)
+		with self._lock:
+			if self.backend == "pe":
+				return self._extract_text_features_pe(texts, batch_size)
+			else:
+				return self._extract_text_features_openclip(texts, batch_size)
 
 	def _extract_text_features_openclip(
 		self, texts: List[str], batch_size: int
@@ -232,12 +240,16 @@ class SentenceEmbeddingHandler:
 		self.device = device
 		self.model_name = model_name
 		self.logger = logger or get_default_logger()
-		
+
+		# Serializes GPU/CUDA inference across threads so multi-sequence eval
+		# doesn't deadlock on shared model state.
+		self._lock = threading.Lock()
+
 		# Load sentence embedding model
 		self.logger.info(f"Loading sentence embedding model {model_name}...")
 		self.sentence_embedding_model = SentenceTransformer(
-			model_name, 
-			model_kwargs=model_kwargs, 
+			model_name,
+			model_kwargs=model_kwargs,
 			tokenizer_kwargs=tokenizer_kwargs
 		)
 		if device == "cuda" and torch.cuda.is_available():
@@ -264,14 +276,15 @@ class SentenceEmbeddingHandler:
 			Array of text embeddings [N, embedding_dim], L2-normalized
 		"""
 
-		embeddings = self.sentence_embedding_model.encode(
-			texts,
-			batch_size=batch_size,
-			show_progress_bar=show_progress,
-			convert_to_numpy=True,
-			prompt_name=prompt_name,
-			prompt=prompt
-		)
+		with self._lock:
+			embeddings = self.sentence_embedding_model.encode(
+				texts,
+				batch_size=batch_size,
+				show_progress_bar=show_progress,
+				convert_to_numpy=True,
+				prompt_name=prompt_name,
+				prompt=prompt
+			)
 
 		if embeddings.ndim == 1:
 			embeddings = embeddings[np.newaxis, :]
