@@ -65,14 +65,20 @@ def load_background_objects_temporal_data(yaml_path: Path) -> Dict[int, Dict]:
 def enrich_background_objects_temporal_data(
 	sg: sdsg.DynamicSceneGraph,
 	bg_temporal_map: Dict[int, Dict],
-	start_time: float
 ) -> int:
 	"""Enrich background objects with temporal data from YAML mapping.
 
+	Writes ABSOLUTE (Unix) timestamps from the YAML directly into
+	metadata['temporal_history']. The downstream preprocess_scene_graph BG
+	loop is the single point that subtracts start_time, matching how OBJECTS
+	temporal_history is handled. Previously this function subtracted start_time
+	too, which combined with the BG loop produced a double-subtract that left
+	BG first_observed at ~-start_time (approx -1.67e9 for CODa), silently
+	filtering every enriched BG node out of any time-window query.
+
 	Args:
 		sg: Scene graph containing BACKGROUND_OBJECTS layer
-		bg_temporal_map: Mapping of semantic_id to temporal data
-		start_time: Unix timestamp to subtract for relative timestamps
+		bg_temporal_map: Mapping of semantic_id to temporal data (Unix seconds)
 
 	Returns:
 		Count of enriched background object nodes
@@ -100,15 +106,10 @@ def enrich_background_objects_temporal_data(
 		# Get existing metadata (mappingproxy is read-only, need a mutable copy)
 		metadata = dict(node.attributes.metadata.get())
 
-		# Adjust timestamps to be relative to start_time
-		# (YAML timestamps are in the same coordinate system as DSG on disk)
-		first_observed_relative = first_observed - start_time
-		last_observed_relative = last_observed - start_time
-
-		# Create temporal_history dict
+		# Write ABSOLUTE timestamps; preprocess_scene_graph normalizes them.
 		temporal_history = {
-			"first_observed": first_observed_relative,
-			"last_observed": last_observed_relative,
+			"first_observed": first_observed,
+			"last_observed": last_observed,
 			"observation_count": observations,
 			"timestamps": [],  # Not available in YAML
 			"frame_ids": []    # Not available in YAML
@@ -213,7 +214,7 @@ def preprocess_scene_graph(
 	if bg_objects_yaml_path is not None and bg_objects_yaml_path.exists():
 		bg_temporal_map = load_background_objects_temporal_data(bg_objects_yaml_path)
 		if bg_temporal_map:
-			enriched_count = enrich_background_objects_temporal_data(sg, bg_temporal_map, start_time)
+			enriched_count = enrich_background_objects_temporal_data(sg, bg_temporal_map)
 			print(f"Enriched {enriched_count} background objects with temporal data from YAML")
 
 	### Background object nodes:
