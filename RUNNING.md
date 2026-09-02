@@ -225,10 +225,14 @@ This will read from the `dsg_updated.json` file and save `clustered_dsg.json` .
 
 Generate LLM-based natural language summaries for room/region nodes:
 
+The OpenAI client reads the key from the environment, so export it first (a `.env` file in the
+repository root also works):
+
 ```bash
+export OPENAI_API_KEY=sk-...
+
 python scripts/summarize_regions.py \
   --data-dir output/my_run \
-  --openai-api-key $OPENAI_API_KEY \
   --model-name gpt-5-nano \
   --n-samples 20
 ```
