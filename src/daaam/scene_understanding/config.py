@@ -42,14 +42,18 @@ class ToolConfig:
 	# Regions:
 	in_region_threshold: float = 4.0 # Distance in meters to consider the robot "in" a region
 
-	default_top_k: int = 20  # Default number of results to return for tools
+	default_top_k: int = 30  # Default number of results to return for tools
 	default_spatial_radius: float = 5.0  # Default radius for spatial searches in tools
 	trajectory_sample_points: int = 10  # Number of trajectory points to sample in get_agent_trajectory_information
 
 	min_radius = 5.0 # Minimum radius for get_objects_in_radius
 	max_radius = 15.0 # Maximum radius for get_objects_in_radius
 
-	otsu_prefilter_percentile: float = 85.0  # Percentile for Otsu pre-filter (higher = tighter pool, e.g. 90 = top 10%)
+	# Percentile for Otsu pre-filter (higher = tighter pool, e.g. 90 = top 10%).
+	# Lowered from 85 to 60 so multi-instance "nearest X" queries (when there are
+	# many same-class objects) admit the right cluster into the candidate pool;
+	# Otsu still narrows to the actual matches before distance ranking.
+	otsu_prefilter_percentile: float = 60.0
 
 @dataclass
 class SceneUnderstandingConfig:

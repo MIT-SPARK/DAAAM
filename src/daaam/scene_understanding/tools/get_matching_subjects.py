@@ -36,9 +36,20 @@ class GetMatchingSubjects(Tool):
 			"Output format: List of objects, each containing 'position' ([x,y,z] in meters), "
 			"'first_observed' and 'last_observed' (timestamps in seconds from recording start, t=0). "
 			"Do not call the a function with the same arguments as you have before, as this will lead to repeated information. "
-			"If this tool does not return a suitable response, try calling the tool with a rephrased description query."
+			"If this tool does not return a suitable response, try calling the tool with a rephrased description query. "
 			"Use sort_by='distance' when looking for the closest or nearest instance of something. "
-			"Use sort_by='relevance' when looking for the best semantic match regardless of location."
+			"Use sort_by='relevance' when looking for the best semantic match regardless of location. "
+			"Object descriptions are auto-generated and may use approximate color, material, or "
+			"shape language - they are not authoritative attribute labels. The semantic_score blends "
+			"visual (image) and text-description similarity, so a candidate can match the query "
+			"visually even when its description text reads slightly differently; trust the score, "
+			"not lexical exact-match. For 'nearest / closest' queries, multiple instances usually "
+			"exist - return the nearest candidate that plausibly matches, do not reject closer "
+			"candidates in favor of a far candidate whose description happens to use the exact query word. "
+			"Specifically: when a top-ranked candidate's description uses different wording than "
+			"your query, it may still be the correct answer if it is at a plausible "
+			"position and could plausibly look like the queried object. Do not discard fitting closeby candidates "
+			"just because a farther candidate matches better on text wording alone."
 		)
 		self._build_signature()
 
