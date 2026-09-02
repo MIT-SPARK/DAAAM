@@ -188,6 +188,23 @@ def preprocess_scene_graph(
 	skipped_objects = 0
 	skipped_background = 0
 
+	# Upstream postprocess_scene_graph occasionally leaves a handful of OBJECTS
+	# / BACKGROUND_OBJECTS nodes with empty metadata (no 'description', no
+	# 'temporal_history', etc.) when the per-node description step fails.
+	# retrieve_objects_from_scene_graph -> ObjectInfo.from_scene_graph_node indexes
+	# metadata['description'] unconditionally, so such nodes raise KeyError before
+	# the agent ever sees them. Remove them upfront.
+	dropped = []
+	for layer_name in (sdsg.DsgLayers.OBJECTS, "BACKGROUND_OBJECTS"):
+		for node in sg.get_layer(layer_name).nodes:
+			md = node.attributes.metadata.get()
+			if not md or "description" not in md:
+				dropped.append(node.id)
+	for nid in dropped:
+		sg.remove_node(nid)
+	if dropped:
+		print(f"Removed {len(dropped)} OBJECTS/BACKGROUND_OBJECTS nodes lacking 'description' in metadata.")
+
 	### Object nodes:
 	for node in sg.get_layer(sdsg.DsgLayers.OBJECTS).nodes:
 		# set object timestamps in scene graph to timestamp - start_time
