@@ -27,7 +27,6 @@ numpy<2.0.0
 zmq
 ultralytics
 segment_anything
-rclpy
 sam2
 open_clip_torch
 numba
