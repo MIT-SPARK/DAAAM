@@ -180,6 +180,7 @@ class PipelineOrchestrator:
 		self.selected_groups_queue = mp.Queue(maxsize=20)
 		self.query_group_queue = mp.Queue(maxsize=50)
 		self.correction_queue = mp.Queue(maxsize=200)
+		self._corrections_stored = 0
 
 	def _initialize_clip_model(self) -> None:
 		"""Initialize CLIP model for CLIP-features if enabled."""
@@ -273,6 +274,7 @@ class PipelineOrchestrator:
 		# STEP 1: Save data FIRST — guarantee output even if later steps hang
 		self.logger.info("[Shutdown Step 1] Saving data...")
 		self.semantic_update_callback = None  # ROS context invalid during shutdown
+		stored_before_save = self._corrections_stored
 		self._save_all_data()
 
 		# STEP 2: Signal workers to stop, then wait with generous timeout
@@ -299,10 +301,13 @@ class PipelineOrchestrator:
 		# STEP 4: Best-effort drain of remaining corrections (workers now stopped)
 		self.logger.info("[Shutdown Step 4] Draining correction queue...")
 		final_count = self._drain_correction_queue_safe(timeout=3.0)
-		# Always re-save: correction processor thread may have consumed items
-		# between Steps 2-3 that weren't persisted by Step 1's early save
-		self.logger.info(f"[Shutdown Step 4] Drained {final_count} late corrections, saving final state...")
-		self._save_all_data()
+		# Re-save only if corrections arrived after Step 1 started; a redundant
+		# multi-GB save on an unchanged state just races the shutdown watchdog
+		if self._corrections_stored != stored_before_save:
+			self.logger.info(f"[Shutdown Step 4] Drained {final_count} late corrections, saving final state...")
+			self._save_all_data()
+		else:
+			self.logger.info("[Shutdown Step 4] No corrections since Step 1 save; skipping re-save")
 
 		# STEP 5: Diagnostics
 		self.logger.info("[Shutdown Step 5] Running diagnostics...")
@@ -371,6 +376,7 @@ class PipelineOrchestrator:
 
 				correction = self._enrich_correction_with_temporal_data(correction)
 				self.scene_graph_service.store_correction(correction)
+				self._corrections_stored += 1
 				count += 1
 			except queue.Empty:
 				break
@@ -839,6 +845,7 @@ class PipelineOrchestrator:
 
 				# Store enriched correction
 				self.scene_graph_service.store_correction(correction)
+				self._corrections_stored += 1
 
 				# Trigger semantic update callback if set
 				if self.semantic_update_callback and hasattr(correction, 'semantic_id'):

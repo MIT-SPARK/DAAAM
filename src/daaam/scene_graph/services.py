@@ -22,6 +22,7 @@ from daaam.utils.vision import (
 )
 from daaam.utils.performance import performance_measure
 from daaam.utils.embedding import EncoderProvenance, stamp_embedding_provenance
+from daaam.utils.io import atomic_path, atomic_yaml_dump
 from daaam.grounding.models import Annotation, ImageAnnotation, ObjectAnnotation
 from daaam.scene_graph.models import (
 	BackgroundObjectData,
@@ -872,10 +873,9 @@ class SceneGraphService:
 			else:
 				self.logger.info("Skipping metadata.add() - scene graph not initialized")
 
-		corrections_file = output_save_dir / f"corrections.yaml"
+		corrections_file = output_save_dir / "corrections.yaml"
 		try:
-			with open(corrections_file, "w") as f:
-				yaml.safe_dump(corrections_data, f)
+			atomic_yaml_dump(corrections_file, corrections_data)
 			self.logger.info(f"Saved corrections to {corrections_file}")
 		except Exception as e:
 			self.logger.error(f"Failed to save corrections YAML: {e}")
@@ -883,10 +883,10 @@ class SceneGraphService:
 		# Save final DSG state - need lock for safe access during save
 		with self.scene_graph_lock:
 			if self.scene_graph_is_set:
-				dsg_file = output_save_dir / f"dsg.json"
+				dsg_file = output_save_dir / "dsg.json"
 				try:
-					# Save the scene graph directly as JSON
-					self.scene_graph.save(str(dsg_file))
+					with atomic_path(dsg_file) as tmp:
+						self.scene_graph.save(str(tmp))
 					self.logger.info(f"Saved final DSG state to {dsg_file}")
 				except Exception as e:
 					self.logger.error(f"Failed to save DSG JSON: {e}")
@@ -903,10 +903,9 @@ class SceneGraphService:
 				cleaned_annotation = {k: v for k, v in annotation_dict.items() if k != "embedding"}
 				out_annotations[ts] = cleaned_annotation
 
-			annotations_file = output_save_dir / f"keyframe_annotations.yaml"
+			annotations_file = output_save_dir / "keyframe_annotations.yaml"
 			try:
-				with open(annotations_file, "w") as f:
-					yaml.safe_dump({"keyframe_annotations": out_annotations}, f)
+				atomic_yaml_dump(annotations_file, {"keyframe_annotations": out_annotations})
 				self.logger.info(f"Saved {len(out_annotations)} keyframe annotations to {annotations_file}")
 			except Exception as e:
 				self.logger.error(f"Failed to save keyframe annotations: {e}")
@@ -956,8 +955,7 @@ class SceneGraphService:
 				background_data['objects'].append(bg_entry)
 
 			try:
-				with open(background_file, 'w') as f:
-					yaml.safe_dump(background_data, f)
+				atomic_yaml_dump(background_file, background_data)
 				self.logger.info(f"Saved {len(self.background_objects)} background objects to {background_file}")
 
 				# Log statistics
