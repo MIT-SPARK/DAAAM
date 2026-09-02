@@ -297,9 +297,10 @@ class PipelineOrchestrator:
 		# STEP 4: Best-effort drain of remaining corrections (workers now stopped)
 		self.logger.info("[Shutdown Step 4] Draining correction queue...")
 		final_count = self._drain_correction_queue_safe(timeout=3.0)
-		if final_count > 0:
-			self.logger.info(f"[Shutdown Step 4] Drained {final_count} late corrections, saving again...")
-			self._save_all_data()
+		# Always re-save: correction processor thread may have consumed items
+		# between Steps 2-3 that weren't persisted by Step 1's early save
+		self.logger.info(f"[Shutdown Step 4] Drained {final_count} late corrections, saving final state...")
+		self._save_all_data()
 
 		# STEP 5: Diagnostics
 		self.logger.info("[Shutdown Step 5] Running diagnostics...")
