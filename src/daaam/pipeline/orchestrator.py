@@ -1252,9 +1252,9 @@ class PipelineOrchestrator:
 			if hasattr(correction, 'selectframe_clip_feature') and correction.selectframe_clip_feature:
 				features.clip_feature = correction.selectframe_clip_feature.tolist() if hasattr(correction.selectframe_clip_feature, 'tolist') else correction.selectframe_clip_feature
 			if hasattr(correction, 'embedding') and correction.embedding is not None:
-				features.semantic_embedding_feature = correction.embedding.tolist() if hasattr(correction.embedding, 'tolist') else correction.embedding
+				features.sentence_embedding_feature = correction.embedding.tolist() if hasattr(correction.embedding, 'tolist') else correction.embedding
 
-			if features.clip_feature or features.semantic_embedding_feature:
+			if features.clip_feature or features.sentence_embedding_feature:
 				update.features[correction.semantic_id] = features
 
 			# Call the callback

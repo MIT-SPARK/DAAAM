@@ -59,7 +59,7 @@ class TemporalObservation(BaseModel):
 class SemanticFeatures(BaseModel):
 	"""Feature vectors for a semantic entity."""
 	clip_feature: Optional[List[float]] = None
-	semantic_embedding_feature: Optional[List[float]] = None
+	sentence_embedding_feature: Optional[List[float]] = None
 
 
 class SemanticUpdate(BaseModel):
