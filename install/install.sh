@@ -20,7 +20,7 @@ echo ""
 
 # --- 0.5 Install ROS2 Prereqs ---
 echo "--- [0.5/5] Installing prerequisite Python packages ---"
-pip install pyem catkin_pkg lark catkin_pkg pyyaml
+pip install "empy==3.3.4" catkin_pkg lark pyyaml
 
 # --- 1. System dependencies ---
 echo "--- [1/5] System dependencies ---"
