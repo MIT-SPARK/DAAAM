@@ -137,6 +137,21 @@ tracking:
 
 When using `.pt` files instead (no TensorRT), the code auto-detects the backend from the file extension — no other changes needed.
 
+### Obtaining the base weights
+
+`checkpoints/` is not tracked in git, so a fresh clone contains no model weights. The FastSAM
+checkpoint must be present before the first run: the loader resolves the configured path and
+raises `FileNotFoundError` if it is missing, rather than falling back to an automatic download.
+Fetch the FastSAM weights from the [upstream release](https://github.com/CASIA-IVA-Lab/FastSAM)
+and place them at the path the config expects, e.g.:
+
+```
+checkpoints/fastsam/FastSAM-x.pt
+```
+
+Paths in `config/pipeline_config.yaml` and the launch files are relative to `checkpoints/`, so
+`model_name: "fastsam/FastSAM-x.pt"` resolves to `checkpoints/fastsam/FastSAM-x.pt`.
+
 ## Optional: GLPK for Assignment Optimization
 
 The `min_frames_max_size` assignment worker uses CVXPY to solve a mixed-integer program. It requires the GLPK solver:
