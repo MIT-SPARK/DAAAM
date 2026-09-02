@@ -34,7 +34,6 @@ onnxscript
 tensorrt-cu12>=7.0.0,!=10.1.0
 onnxslim>=0.1.71
 onnxruntime-gpu
-tensorrt
 wheel
 rerun-sdk
 sentence_transformers==4.1.0

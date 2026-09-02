@@ -98,9 +98,15 @@ FastSAM and the BotSort ReID model can be exported to TensorRT `.engine` files f
 
 ### Prerequisites
 
-The PyTorch CUDA version and the TensorRT CUDA version **must match**. If PyTorch is installed with `cu128`, TensorRT must the same version of CUDA that your GPU is running.
+The PyTorch CUDA version and the TensorRT CUDA version **must match**. If PyTorch is installed with `cu128`, TensorRT must also target CUDA 12, which is why [requirements.txt](./requirements.txt) pins `tensorrt-cu12` explicitly:
 
-**Warning:** If you are using a CUDA version other than 12.X or do not intend to use TRT acceleration, adjust the version of `tensorrt-cuXX`in [requirements.txt](./requirements.txt) .
+```bash
+pip install tensorrt-cu12==10.13.3.9
+```
+
+**Warning:** do not add the bare `tensorrt` or `nvidia-tensorrt` meta-packages. They select a CUDA variant rather than providing the module themselves, and on PyPI they now default to `tensorrt_cu13`, which loads CUDA 13 runtime libs alongside PyTorch's CUDA 12 libs. That combination is unsupported by NVIDIA and can cause GPU hangs and system freezes.
+
+If you are using a CUDA version other than 12.X, or do not intend to use TRT acceleration, adjust the `tensorrt-cuXX` requirement accordingly.
 
 Further, the defaults in all launch files in [DAAAM-ROS](https://github.com/MIT-SPARK/DAAAM-ROS/tree/main/launch) are set to `.engine` files. if you intend to use standard `.pt` models, adapt the launch files. 
 
