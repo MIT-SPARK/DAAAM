@@ -31,7 +31,8 @@ from daaam.utils.geometry import (
 					)
 from daaam.utils.embedding import CLIPHandler
 from daaam.grounding.models import ObjectAnnotation
-from daaam.pipeline.models import PromptRecord, Frame, MinimalCorrection, SemanticUpdate, TemporalObservation, SemanticFeatures
+from daaam.pipeline.models import PromptRecord, Frame, MinimalCorrection
+from daaam.scene_graph.models import SemanticUpdate, TemporalObservation, SemanticFeatures
 from daaam.tracking.models import Track, SimplifiedTrack
 from daaam.assignment.models import AssignmentTask, SelectedGroup
 from daaam.assignment.schemas import assignment_task_to_json

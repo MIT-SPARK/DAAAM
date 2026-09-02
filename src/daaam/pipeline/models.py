@@ -47,25 +47,3 @@ class MinimalCorrection(BaseModel):
 	task_relevance: Optional[List[str]] = None
 
 
-class TemporalObservation(BaseModel):
-	"""Temporal observation data for a semantic entity."""
-	frame_ids: List[int]
-	timestamps: List[float]
-	observation_count: int
-	first_observed: Optional[float] = None
-	last_observed: Optional[float] = None
-
-
-class SemanticFeatures(BaseModel):
-	"""Feature vectors for a semantic entity."""
-	clip_feature: Optional[List[float]] = None
-	sentence_embedding_feature: Optional[List[float]] = None
-
-
-class SemanticUpdate(BaseModel):
-	"""Incremental semantic update message for publishing."""
-	timestamp: float
-	semantic_labels: Dict[int, str]  # semantic_id -> label
-	temporal_observations: Dict[int, TemporalObservation]  # semantic_id -> temporal data
-	features: Dict[int, SemanticFeatures]  # semantic_id -> features
-

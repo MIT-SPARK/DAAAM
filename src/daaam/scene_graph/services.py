@@ -23,8 +23,9 @@ from daaam.utils.vision import (
 from daaam.utils.performance import performance_measure
 from daaam.utils.embedding import EncoderProvenance, stamp_embedding_provenance
 from daaam.grounding.models import Annotation, ImageAnnotation, ObjectAnnotation
-from daaam.scene_graph.models import BackgroundObjectData, ObjectPosition
-from daaam.pipeline.models import (
+from daaam.scene_graph.models import (
+	BackgroundObjectData,
+	ObjectPosition,
 	SemanticUpdate,
 	TemporalObservation,
 	SemanticFeatures
