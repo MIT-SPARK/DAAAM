@@ -175,7 +175,7 @@ Key CLI arguments:
 | `--dataset-type` | `ImageSequenceDataset` | Dataset loader class |
 | `--hydra-config-path` | `coda_dataset_khronos.yaml` | Hydra integration config |
 | `--sam-model` | `fastsam/FastSAM-s.pt` | SAM model path |
-| `--sentence-embedding-model` | `sentence-transformers/sentence-t5-large` | Embedding model for post-processing |
+| `--sentence-embedding-model` | `sentence-transformers/sentence-t5-xl` | Embedding model for post-processing |
 | `--target-fps` | | Target processing framerate |
 | `--max-frames` | | Maximum frames to process |
 | `--depth-scale` | `1.0` | Depth scale factor |

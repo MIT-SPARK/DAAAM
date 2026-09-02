@@ -18,7 +18,7 @@ class ToolConfig:
 	temporal_window_size: float = 50.0  # Time window size in seconds for temporal filtering in filter_then_rank mode
 	
 	# Semantic search parameters
-	sentence_embedding_model_name: str = "sentence-transformers/sentence-t5-large"  # SentenceTransformer model for text embeddings
+	sentence_embedding_model_name: str = "sentence-transformers/sentence-t5-xl"  # SentenceTransformer model for text embeddings
 	clip_model_name: Optional[str] = "ViT-L-14"  # Optional CLIP model 
 	clip_backend: Optional[str] = "openai"  # Backend for CLIP model (e.g., open_clip, clip)
 	clip_weight: float = 0.5  # Weight for CLIP embeddings in combined scoring

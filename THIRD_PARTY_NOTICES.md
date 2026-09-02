@@ -42,7 +42,7 @@ source is always the upstream project's own `LICENSE` file.
 | EfficientViT-SAM | https://github.com/mit-han-lab/efficientvit | Lightweight SAM variant (`efficientvit_sam_*`). |
 | Describe Anything Model — code | https://github.com/NVlabs/describe-anything (fork at https://github.com/nicogorlo/describe-anything-batch) | DAM grounding worker. **Model weights are separately licensed — see §4.** |
 | Perception Encoder (PE) | https://github.com/facebookresearch/perception_models (LICENSE.PE) | CLIP-like image/text embeddings. Only the Apache-2.0 PE side is used; the FAIR-Noncommercial PLM side is not invoked (see §4). |
-| Sentence-Transformers | https://github.com/UKPLab/sentence-transformers | Text embeddings (`sentence-t5-large`). |
+| Sentence-Transformers | https://github.com/UKPLab/sentence-transformers | Text embeddings (`sentence-t5-xl`). |
 | Hugging Face Transformers | https://github.com/huggingface/transformers | Model loading. |
 | Gradio | https://github.com/gradio-app/gradio | Interactive UI for grounding-model comparison scripts. |
 | OpenCV (opencv-python) | https://github.com/opencv/opencv-python | Image processing. |

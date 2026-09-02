@@ -48,7 +48,7 @@ workers:
     dam_conv_mode: "v1"
     dam_prompt_mode: "focal_prompt"
     multi_image_min_n_masks: 32  # Set to enable multi-image processing
-    sentence_embedding_model_name: "" # sentence-transformers/sentence-t5-large
+    sentence_embedding_model_name: "" # sentence-transformers/sentence-t5-xl
     compute_full_image_description: false
     save_grounding_images: false  # Save images with masks for debugging
     save_plain_grounding_images: false
