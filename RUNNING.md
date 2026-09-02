@@ -258,8 +258,10 @@ python scripts/run_static_visualizer.py \
 | `--log-object-meshes` | `false` | Log individual object meshes |
 | `--spawn` / `--no-spawn` | `--spawn` | Open Rerun viewer automatically |
 | `--z-offset-objects` | `0.0` | Z offset for object layer |
-| `--z-offset-places` | `10.0` | Z offset for places layer |
-| `--z-offset-rooms` | `20.0` | Z offset for rooms layer |
+| `--z-offset-places` | `20.0` | Z offset for places/traversability layer |
+| `--z-offset-rooms` | `40.0` | Z offset for rooms layer |
+| `--z-offset-buildings` | `80.0` | Z offset for buildings layer |
+| `--z-offset-gt` | `0.0` | Z offset for ground truth objects |
 
 ## 8. Pipeline Outputs
 
