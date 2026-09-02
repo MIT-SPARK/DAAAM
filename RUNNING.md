@@ -155,11 +155,19 @@ Key launch arguments:
 
 !WARNING! This can be brittle and is not the preferred option of running the pipeline as the hydra python bindings are less actively maintained. If there are errors, please try to use the ROS2 [DAAAM-ROS](https://github.com/MIT-SPARK/DAAAM-ROS) interface.
 
+This path additionally requires the `hydra_python` bindings, which are built as part of the
+colcon workspace (see [INSTALL.md](./INSTALL.md)) and are not installed by `requirements.txt`.
+Source the workspace before running, or the pipeline starts up and then processes zero frames.
+
+The Hydra configs live in [DAAAM-ROS](https://github.com/MIT-SPARK/DAAAM-ROS/tree/main/config/hydra_config),
+not in this repository, so `--hydra-config-path` must point at that checkout (or at the installed
+`share/daaam_ros/config/hydra_config/` directory). It takes a full path, not a bare config name.
+
 The standalone pipeline script reads image sequences or rosbags directly:
 
 ```bash
 python scripts/run_pipeline.py /path/to/dataset \
-  --hydra-config coda_dataset_khronos \
+  --hydra-config-path /path/to/daaam_ros/config/hydra_config/coda_dataset_khronos.yaml \
   --dataset-type ImageSequenceDataset \
   --target-fps 10 \
   --output-dir output/my_run
@@ -173,7 +181,7 @@ Key CLI arguments:
 | `--config` | `config/pipeline_config.yaml` | Pipeline config file |
 | `--config-overrides` | | Key=value overrides (e.g. `workers.num_grounding_workers=8`) |
 | `--dataset-type` | `ImageSequenceDataset` | Dataset loader class |
-| `--hydra-config-path` | `coda_dataset_khronos.yaml` | Hydra integration config |
+| `--hydra-config-path` | *(placeholder, must be set)* | Full path to a Hydra config YAML, shipped in DAAAM-ROS |
 | `--sam-model` | `fastsam/FastSAM-s.pt` | SAM model path |
 | `--sentence-embedding-model` | `sentence-transformers/sentence-t5-xl` | Embedding model for post-processing |
 | `--target-fps` | | Target processing framerate |
