@@ -13,7 +13,7 @@ import torch
 from PIL import Image
 
 from daaam.scene_understanding.config import SceneUnderstandingConfig
-from daaam.utils.embedding import CLIPHandler, SentenceEmbeddingHandler
+from daaam.utils.embedding import CLIPHandler, SentenceEmbeddingHandler, verify_embedding_provenance
 from daaam.utils.logging import PipelineLogger, get_default_logger
 from daaam.scene_understanding.models import Response
 from daaam.scene_understanding.interfaces import (
@@ -378,6 +378,12 @@ class SceneUnderstandingAgent(SceneUnderstandingInterface):
 	
 	def update_scene_graph(self, new_graph: sdsg.DynamicSceneGraph):
 		"""Update the internal scene graph representation."""
+		verify_embedding_provenance(
+			new_graph,
+			sentence_handler=self.sentence_handler,
+			clip_handler=self.clip_handler,
+			logger=self.logger,
+		)
 		self.scene_graph = new_graph
 		# Update tool store with new scene graph
 		self.tool_registry.set_scene_graph(new_graph)

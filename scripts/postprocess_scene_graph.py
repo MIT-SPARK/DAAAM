@@ -4,7 +4,7 @@ import click
 import yaml
 from pathlib import Path
 
-from daaam.utils.embedding import SentenceEmbeddingHandler
+from daaam.utils.embedding import SentenceEmbeddingHandler, EncoderProvenance, stamp_embedding_provenance
 
 
 @click.command()
@@ -151,6 +151,15 @@ def main(data_dir: str, sentence_model_name: str):
         sg_metadata["features"][sem_idx] = features
 
     scene_graph.metadata.set(sg_metadata)
+
+    stamp_embedding_provenance(
+        scene_graph,
+        sentence=EncoderProvenance(
+            model_name=sentence_model_name,
+            backend="sentence_transformers",
+            dim=handler.embedding_dim,
+        ),
+    )
 
     updated_path = str(sg_path).replace('.json', '_updated.json')
     scene_graph.save(updated_path)

@@ -64,6 +64,10 @@ class PipelineOrchestrator:
 			logger,
 			defer_dsg_processing=config.scene_graph.defer_dsg_processing,
 			enable_background_objects=config.scene_graph.enable_background_objects,
+			clip_model_name=config.workers.dam_grounding_config.selectframe_clip_model_name,
+			clip_backend=config.workers.dam_grounding_config.selectframe_clip_backend,
+			clip_pretrained=config.workers.dam_grounding_config.selectframe_clip_model_dataset,
+			sentence_model_name=config.workers.dam_grounding_config.sentence_embedding_model_name or "",
 		)
 		
 		# state management

@@ -21,6 +21,7 @@ from daaam.utils.vision import (
 	load_color_map
 )
 from daaam.utils.performance import performance_measure
+from daaam.utils.embedding import EncoderProvenance, stamp_embedding_provenance
 from daaam.grounding.models import Annotation, ImageAnnotation, ObjectAnnotation
 from daaam.scene_graph.models import BackgroundObjectData, ObjectPosition
 from daaam.pipeline.models import (
@@ -33,12 +34,19 @@ from daaam.pipeline.models import (
 class SceneGraphService:
 	"""Service for handling scene graph corrections and updates."""
 
-	def __init__(self, semantic_config_path: Path, labelspace_colors_path: Optional[Path] = None, logger: Optional[PipelineLogger] = None, defer_dsg_processing: bool = False, enable_background_objects: bool = True, hydra_dsg_path: str = ""):
+	def __init__(self, semantic_config_path: Path, labelspace_colors_path: Optional[Path] = None, logger: Optional[PipelineLogger] = None, defer_dsg_processing: bool = False, enable_background_objects: bool = True, hydra_dsg_path: str = "", clip_model_name: str = "", clip_backend: str = "", clip_pretrained: Optional[str] = None, sentence_model_name: str = ""):
 		self.logger = logger or get_default_logger()
 		self.scene_graph = DynamicSceneGraph()
 		self.scene_graph_is_set = False
 		self.defer_dsg_processing = defer_dsg_processing
 		self.hydra_dsg_path = Path(hydra_dsg_path) if hydra_dsg_path else None
+
+		# Encoder identities, recorded into graph metadata so the query side can
+		# refuse a scene graph embedded with different models.
+		self.clip_model_name = clip_model_name
+		self.clip_backend = clip_backend
+		self.clip_pretrained = clip_pretrained
+		self.sentence_model_name = sentence_model_name
 		self.deferred_updates = []  # Store (binary, full_update, deleted_nodes) tuples
 
 		self.corrections: Dict[int, ObjectAnnotation] = {}
@@ -762,6 +770,43 @@ class SceneGraphService:
 		self.logger.info(f"Loaded Hydra DSG from {dsg_json} ({n_objects} objects)")
 		return True
 
+	def _stamp_embedding_provenance(self, features: Dict[int, Dict[str, Any]]) -> None:
+		"""Record which encoders produced the stored features.
+
+		Widths come from the vectors themselves rather than from the models, so the
+		record cannot drift from the data it describes.
+		"""
+		clip_dim = self._first_feature_dim(features, "clip_feature")
+		sentence_dim = self._first_feature_dim(features, "sentence_embedding_feature")
+
+		clip = None
+		if clip_dim is not None and self.clip_model_name:
+			clip = EncoderProvenance(
+				model_name=self.clip_model_name,
+				backend=self.clip_backend,
+				pretrained=self.clip_pretrained,
+				dim=clip_dim,
+			)
+		sentence = None
+		if sentence_dim is not None and self.sentence_model_name:
+			sentence = EncoderProvenance(
+				model_name=self.sentence_model_name,
+				backend="sentence_transformers",
+				dim=sentence_dim,
+			)
+		if clip is None and sentence is None:
+			return
+		stamp_embedding_provenance(self.scene_graph, sentence=sentence, clip=clip)
+
+	@staticmethod
+	def _first_feature_dim(features: Dict[int, Dict[str, Any]], key: str) -> Optional[int]:
+		"""Width of the first non-empty vector stored under key, or None."""
+		for entry in features.values():
+			vector = entry.get(key)
+			if vector is not None and len(vector) > 0:
+				return len(vector)
+		return None
+
 	def save_data(self, output_save_dir: Path) -> None:
 		"""Save DSG and corrections to files."""
 		# Prefer topic-based DSG (deferred updates) over disk loading
@@ -821,6 +866,7 @@ class SceneGraphService:
 		with self.scene_graph_lock:
 			if self.scene_graph_is_set:
 				self.scene_graph.metadata.add({"features": features})
+				self._stamp_embedding_provenance(features)
 				self.logger.debug(f"Added {len(features)} feature entries to scene graph metadata")
 			else:
 				self.logger.info("Skipping metadata.add() - scene graph not initialized")
