@@ -110,6 +110,7 @@ class SceneGraphConfig:
 	"""Configuration for scene graph service."""
 	defer_dsg_processing: bool = False  # Defer DSG processing until shutdown for performance
 	enable_background_objects: bool = True  # Enable tracking of all objects including those filtered by Hydra
+	hydra_dsg_path: str = ""  # Path to Hydra's output directory; loads <path>/backend/dsg.json at shutdown
 
 
 @dataclass

@@ -64,6 +64,7 @@ class PipelineOrchestrator:
 			logger,
 			defer_dsg_processing=config.scene_graph.defer_dsg_processing,
 			enable_background_objects=config.scene_graph.enable_background_objects,
+			hydra_dsg_path=config.scene_graph.hydra_dsg_path,
 			clip_model_name=config.workers.dam_grounding_config.selectframe_clip_model_name,
 			clip_backend=config.workers.dam_grounding_config.selectframe_clip_backend,
 			clip_pretrained=config.workers.dam_grounding_config.selectframe_clip_model_dataset,

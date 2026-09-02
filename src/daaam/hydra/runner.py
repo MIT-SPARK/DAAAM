@@ -114,6 +114,8 @@ class HydraPipelineRunner:
 			
 		# Update config with output directory and critical paths
 		self.config.output_dir = str(self.output_dir)
+		self.config.scene_graph.hydra_dsg_path = str(self.output_dir / "hydra_output")
+		self.config.scene_graph.defer_dsg_processing = False  # no ROS topic callbacks -> disk load path
 		
 		# Ensure semantic config paths are absolute
 		if not Path(self.config.semantic_config_path).is_absolute():
