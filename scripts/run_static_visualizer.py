@@ -51,7 +51,7 @@ LAYER_COLORS = {
 
 def _assert_eye_controls_available(spin_speed):
 	"""Fail fast with upgrade guidance if the installed rerun-sdk lacks orbital-spin blueprint support."""
-	upgrade_hint = "/home/nico/.pyenv/versions/cv/bin/pip install -U 'rerun-sdk'"
+	upgrade_hint = "pip install -U 'rerun-sdk'"
 	assert hasattr(rrb, "EyeControls3D") and hasattr(rrb, "Eye3DKind"), (
 		f"--spin-speed={spin_speed} needs rerun-sdk eye-controls support "
 		f"(EyeControls3D added in 0.24.0; spin_speed field present in 0.33.0). "
