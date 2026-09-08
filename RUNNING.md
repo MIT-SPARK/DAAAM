@@ -150,6 +150,15 @@ Key launch arguments:
 | `depth_lb` | `0.05` | Minimum valid depth (m) |
 | `depth_ub` | `20.0` | Maximum valid depth (m) |
 | `exit_after_clock` | `true` | Shut down when bag finishes |
+| `cuda_device` | *(inherit env)* | CUDA device for the grounding workers, e.g. `1` (sets `CUDA_VISIBLE_DEVICES` for them) |
+
+Bag playback robustness is governed by node and Hydra parameters rather than launch arguments:
+`input_queue_size` (default `100`, in `daaam_node.launch.yaml`) sizes the RGB/depth subscribers and
+synchronizer so short processing stalls do not drop frames; the Hydra receiver uses the matching
+`queue_size: 100` in `config/hydra_ros_config/coda_dataset_input_config.yaml`;
+`backend.min_dsg_separation_s: 5.0` in `config/hydra_config/coda_dataset_khronos.yaml` throttles the
+intermediate scene-graph publishes; `shutdown_timeout_s` (default `300`) bounds the shutdown watchdog
+so that saving a large scene graph on long sequences is never cut short.
 
 ## 5. Running without ROS 2
 

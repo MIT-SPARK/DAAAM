@@ -61,6 +61,7 @@ YAML
 # Build (gtsam is RAM-hungry — use -j2 on <16 GB machines)
 cd ~/ros2_ws
 colcon build --continue-on-error
+# The daaam_ros build also generates config/labels_pseudo.{yaml,csv} (gitignored); no manual step needed.
 
 # Python deps + editable install
 cd ~/ros2_ws/src/daaam
