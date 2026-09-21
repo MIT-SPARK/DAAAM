@@ -21,9 +21,12 @@ from daaam.utils.vision import (
 	load_color_map
 )
 from daaam.utils.performance import performance_measure
+from daaam.utils.embedding import EncoderProvenance, stamp_embedding_provenance
+from daaam.utils.io import atomic_path, atomic_yaml_dump
 from daaam.grounding.models import Annotation, ImageAnnotation, ObjectAnnotation
-from daaam.scene_graph.models import BackgroundObjectData, ObjectPosition
-from daaam.pipeline.models import (
+from daaam.scene_graph.models import (
+	BackgroundObjectData,
+	ObjectPosition,
 	SemanticUpdate,
 	TemporalObservation,
 	SemanticFeatures
@@ -33,11 +36,19 @@ from daaam.pipeline.models import (
 class SceneGraphService:
 	"""Service for handling scene graph corrections and updates."""
 
-	def __init__(self, semantic_config_path: Path, labelspace_colors_path: Optional[Path] = None, logger: Optional[PipelineLogger] = None, defer_dsg_processing: bool = False, enable_background_objects: bool = True):
+	def __init__(self, semantic_config_path: Path, labelspace_colors_path: Optional[Path] = None, logger: Optional[PipelineLogger] = None, defer_dsg_processing: bool = False, enable_background_objects: bool = True, hydra_dsg_path: str = "", clip_model_name: str = "", clip_backend: str = "", clip_pretrained: Optional[str] = None, sentence_model_name: str = ""):
 		self.logger = logger or get_default_logger()
 		self.scene_graph = DynamicSceneGraph()
 		self.scene_graph_is_set = False
 		self.defer_dsg_processing = defer_dsg_processing
+		self.hydra_dsg_path = Path(hydra_dsg_path) if hydra_dsg_path else None
+
+		# Encoder identities, recorded into graph metadata so the query side can
+		# refuse a scene graph embedded with different models.
+		self.clip_model_name = clip_model_name
+		self.clip_backend = clip_backend
+		self.clip_pretrained = clip_pretrained
+		self.sentence_model_name = sentence_model_name
 		self.deferred_updates = []  # Store (binary, full_update, deleted_nodes) tuples
 
 		self.corrections: Dict[int, ObjectAnnotation] = {}
@@ -60,15 +71,19 @@ class SceneGraphService:
 		self.labelspace_colors_path = labelspace_colors_path
 
 		# load semantic configuration and color maps (autogenerating if paths do not exist)
-		if not semantic_config_path.exists():
-			self.logger.warning(f"Semantic config not found: {semantic_config_path}, creating with default labels")
-			# hack around Hydra: create dict of empty pseudolabels that get assigned to
-			# semantic descriptions asynchronously. Hydra will construct DSG based on
-			# unlabeled primitives. 
-			# TODO: if hack is kept, add logic to increase size of label map for more 
-			# than 10000 labels
-			# TODO: alternatively find better way to handle this
-			create_label_map(str(semantic_config_path), 10000)
+		# create_label_map generates both YAML and CSV from the same base path,
+		# so regenerate both if either file is missing.
+		colors_path = Path(labelspace_colors_path) if labelspace_colors_path else None
+		if not semantic_config_path.exists() or (colors_path and not colors_path.exists()):
+			missing = []
+			if not semantic_config_path.exists():
+				missing.append(f"YAML ({semantic_config_path})")
+			if colors_path and not colors_path.exists():
+				missing.append(f"CSV ({colors_path})")
+			self.logger.warning(f"Label files missing: {', '.join(missing)} — creating with default pseudo labels")
+			# TODO: if hack is kept, add logic to increase size of label map for more
+			# than 30000 labels
+			create_label_map(str(semantic_config_path), 30000)
 		self.semantic_config = load_semantic_config(semantic_config_path)
 		self.color_map = load_color_map(labelspace_colors_path)
 		self.logger.info(
@@ -743,11 +758,66 @@ class SceneGraphService:
 			
 			return self.latest_corrected_dsg.copy()
 		
+	def load_hydra_dsg(self) -> bool:
+		"""Load Hydra's saved DSG from disk (includes active window objects extracted at shutdown)."""
+		assert self.hydra_dsg_path is not None
+		dsg_json = self.hydra_dsg_path / "backend" / "dsg.json"
+		if not dsg_json.exists():
+			self.logger.warning(f"Hydra DSG not found at {dsg_json}")
+			return False
+		with self.scene_graph_lock:
+			self.scene_graph = DynamicSceneGraph.load(str(dsg_json))
+			self.scene_graph_is_set = True
+		n_objects = len([n for n in self.scene_graph.get_layer(DsgLayers.OBJECTS).nodes])
+		self.logger.info(f"Loaded Hydra DSG from {dsg_json} ({n_objects} objects)")
+		return True
+
+	def _stamp_embedding_provenance(self, features: Dict[int, Dict[str, Any]]) -> None:
+		"""Record which encoders produced the stored features.
+
+		Widths come from the vectors themselves rather than from the models, so the
+		record cannot drift from the data it describes.
+		"""
+		clip_dim = self._first_feature_dim(features, "clip_feature")
+		sentence_dim = self._first_feature_dim(features, "sentence_embedding_feature")
+
+		clip = None
+		if clip_dim is not None and self.clip_model_name:
+			clip = EncoderProvenance(
+				model_name=self.clip_model_name,
+				backend=self.clip_backend,
+				pretrained=self.clip_pretrained,
+				dim=clip_dim,
+			)
+		sentence = None
+		if sentence_dim is not None and self.sentence_model_name:
+			sentence = EncoderProvenance(
+				model_name=self.sentence_model_name,
+				backend="sentence_transformers",
+				dim=sentence_dim,
+			)
+		if clip is None and sentence is None:
+			return
+		stamp_embedding_provenance(self.scene_graph, sentence=sentence, clip=clip)
+
+	@staticmethod
+	def _first_feature_dim(features: Dict[int, Dict[str, Any]], key: str) -> Optional[int]:
+		"""Width of the first non-empty vector stored under key, or None."""
+		for entry in features.values():
+			vector = entry.get(key)
+			if vector is not None and len(vector) > 0:
+				return len(vector)
+		return None
+
 	def save_data(self, output_save_dir: Path) -> None:
 		"""Save DSG and corrections to files."""
-		# Apply any deferred updates first
+		# Prefer topic-based DSG (deferred updates) over disk loading
 		if self.defer_dsg_processing:
 			self.apply_deferred_updates()
+		elif self.hydra_dsg_path:
+			# Fallback: load from disk (Python path without ROS topics)
+			if self.load_hydra_dsg():
+				self.apply_corrections()
 
 		label_names = []
 
@@ -798,14 +868,14 @@ class SceneGraphService:
 		with self.scene_graph_lock:
 			if self.scene_graph_is_set:
 				self.scene_graph.metadata.add({"features": features})
+				self._stamp_embedding_provenance(features)
 				self.logger.debug(f"Added {len(features)} feature entries to scene graph metadata")
 			else:
 				self.logger.info("Skipping metadata.add() - scene graph not initialized")
 
-		corrections_file = output_save_dir / f"corrections.yaml"
+		corrections_file = output_save_dir / "corrections.yaml"
 		try:
-			with open(corrections_file, "w") as f:
-				yaml.safe_dump(corrections_data, f)
+			atomic_yaml_dump(corrections_file, corrections_data)
 			self.logger.info(f"Saved corrections to {corrections_file}")
 		except Exception as e:
 			self.logger.error(f"Failed to save corrections YAML: {e}")
@@ -813,10 +883,10 @@ class SceneGraphService:
 		# Save final DSG state - need lock for safe access during save
 		with self.scene_graph_lock:
 			if self.scene_graph_is_set:
-				dsg_file = output_save_dir / f"dsg.json"
+				dsg_file = output_save_dir / "dsg.json"
 				try:
-					# Save the scene graph directly as JSON
-					self.scene_graph.save(str(dsg_file))
+					with atomic_path(dsg_file) as tmp:
+						self.scene_graph.save(str(tmp))
 					self.logger.info(f"Saved final DSG state to {dsg_file}")
 				except Exception as e:
 					self.logger.error(f"Failed to save DSG JSON: {e}")
@@ -833,10 +903,9 @@ class SceneGraphService:
 				cleaned_annotation = {k: v for k, v in annotation_dict.items() if k != "embedding"}
 				out_annotations[ts] = cleaned_annotation
 
-			annotations_file = output_save_dir / f"keyframe_annotations.yaml"
+			annotations_file = output_save_dir / "keyframe_annotations.yaml"
 			try:
-				with open(annotations_file, "w") as f:
-					yaml.safe_dump({"keyframe_annotations": out_annotations}, f)
+				atomic_yaml_dump(annotations_file, {"keyframe_annotations": out_annotations})
 				self.logger.info(f"Saved {len(out_annotations)} keyframe annotations to {annotations_file}")
 			except Exception as e:
 				self.logger.error(f"Failed to save keyframe annotations: {e}")
@@ -886,8 +955,7 @@ class SceneGraphService:
 				background_data['objects'].append(bg_entry)
 
 			try:
-				with open(background_file, 'w') as f:
-					yaml.safe_dump(background_data, f)
+				atomic_yaml_dump(background_file, background_data)
 				self.logger.info(f"Saved {len(self.background_objects)} background objects to {background_file}")
 
 				# Log statistics

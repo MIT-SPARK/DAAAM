@@ -22,12 +22,19 @@ def detect_provider(model_name: str) -> Provider:
 	return Provider.OPENAI
 
 
-def create_client(provider: Provider):
+def create_client(provider: Provider, timeout: float = 120.0, max_retries: int = 2):
+	"""Build a provider-aware client.
+
+	`timeout` is the per-request HTTP timeout in seconds. It must be set when
+	running multi-sequence eval so a stalled connection (server-side FIN, dead
+	keep-alive, etc.) fails fast and frees the worker thread instead of hanging
+	the whole pool.
+	"""
 	if provider == Provider.ANTHROPIC:
 		import anthropic
-		return anthropic.Anthropic()
+		return anthropic.Anthropic(timeout=timeout, max_retries=max_retries)
 	from openai import OpenAI
-	return OpenAI()
+	return OpenAI(timeout=timeout, max_retries=max_retries)
 
 
 # Tool signature conversion: canonical OpenAI → Anthropic
@@ -89,7 +96,7 @@ def _serialize_content_blocks(content_blocks: list) -> list:
 
 
 def _serialize_anthropic_response(response) -> dict:
-	"""Pre-serialize an Anthropic response into dict format."""
+	"""Pre-serialize an Anthropic response into the dict format eval_navqa.py expects."""
 	text_preview = ""
 	for block in response.content:
 		if hasattr(block, "text"):
@@ -163,16 +170,33 @@ def run_anthropic_tool_loop(
 
 				result = tool_registry.call_tool(block.name, json.dumps(block.input))
 
-				# Strip _images sentinel before serialisation
 				text_result = result
+				images_payload = None
 				if isinstance(result, dict) and "_images" in result:
+					images_payload = result["_images"]
 					text_result = {k: v for k, v in result.items() if k != "_images"}
 
 				result_json = json.dumps(round_floats(text_result))
+				content: list = [{"type": "text", "text": result_json}]
+				if images_payload:
+					# Anthropic accepts image blocks directly inside tool_result.content.
+					for img in images_payload:
+						content.append({
+							"type": "image",
+							"source": {
+								"type": "base64",
+								"media_type": "image/jpeg",
+								"data": img["base64"],
+							},
+						})
+						label = img.get("label", "")
+						if label:
+							content.append({"type": "text", "text": label})
+
 				tool_results.append({
 					"type": "tool_result",
 					"tool_use_id": block.id,
-					"content": result_json,
+					"content": content,
 				})
 				iteration_data["tool_results"] = text_result
 

@@ -227,10 +227,18 @@ class CodaDataset(BaseDataset):
 		T_world_os1[:3, :3] = R_world_os1
 		T_world_os1[:3, 3] = translation
 
-		T_os1_cam = self.os1_to_cam_transforms.get(self.primary_camera)
-		if T_os1_cam is None:
+		T_cam_os1 = self.os1_to_cam_transforms.get(self.primary_camera)
+		if T_cam_os1 is None:
 			# No extrinsic -> return os1 pose directly
 			return np.concatenate([translation, quat_xyzw])
+
+		# calib_os1_to_<cam>.yaml stores T_cam_os1 (os1 points -> camera frame): its
+		# projection_matrix is P_rect @ R_rect @ extrinsic_matrix, which only holds for
+		# that direction. Invert to get T_os1_cam before composing with the os1 pose.
+		R_cam_os1 = T_cam_os1[:3, :3]
+		T_os1_cam = np.eye(4)
+		T_os1_cam[:3, :3] = R_cam_os1.T
+		T_os1_cam[:3, 3] = -R_cam_os1.T @ T_cam_os1[:3, 3]
 
 		T_world_cam = T_world_os1 @ T_os1_cam
 

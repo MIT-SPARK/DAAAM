@@ -85,9 +85,15 @@ class TrackingService:
 		
 		if len(detections) > 0:
 			tracks = self.tracker.update(detections, frame)
-			# increment track IDs by 1
-			tracks[:, 4] += 1
-			return tracks
+			# boxmot returns a shape-(0,) array when a frame has detections but no
+			# confirmed track, so the 2-D indexing below needs both guards.
+			if tracks.ndim == 1:
+				tracks = tracks.reshape(1, -1)
+			if len(tracks) > 0 and tracks.shape[1] >= 8:
+				# increment track IDs by 1
+				tracks[:, 4] += 1
+				return tracks
+			return np.empty((0, 8))
 		else:
 			return np.empty((0, 8))
 	

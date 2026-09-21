@@ -31,7 +31,8 @@ from daaam.utils.geometry import (
 					)
 from daaam.utils.embedding import CLIPHandler
 from daaam.grounding.models import ObjectAnnotation
-from daaam.pipeline.models import PromptRecord, Frame, MinimalCorrection, SemanticUpdate, TemporalObservation, SemanticFeatures
+from daaam.pipeline.models import PromptRecord, Frame, MinimalCorrection
+from daaam.scene_graph.models import SemanticUpdate, TemporalObservation, SemanticFeatures
 from daaam.tracking.models import Track, SimplifiedTrack
 from daaam.assignment.models import AssignmentTask, SelectedGroup
 from daaam.assignment.schemas import assignment_task_to_json
@@ -64,6 +65,11 @@ class PipelineOrchestrator:
 			logger,
 			defer_dsg_processing=config.scene_graph.defer_dsg_processing,
 			enable_background_objects=config.scene_graph.enable_background_objects,
+			hydra_dsg_path=config.scene_graph.hydra_dsg_path,
+			clip_model_name=config.workers.dam_grounding_config.selectframe_clip_model_name,
+			clip_backend=config.workers.dam_grounding_config.selectframe_clip_backend,
+			clip_pretrained=config.workers.dam_grounding_config.selectframe_clip_model_dataset,
+			sentence_model_name=config.workers.dam_grounding_config.sentence_embedding_model_name or "",
 		)
 		
 		# state management
@@ -174,6 +180,7 @@ class PipelineOrchestrator:
 		self.selected_groups_queue = mp.Queue(maxsize=20)
 		self.query_group_queue = mp.Queue(maxsize=50)
 		self.correction_queue = mp.Queue(maxsize=200)
+		self._corrections_stored = 0
 
 	def _initialize_clip_model(self) -> None:
 		"""Initialize CLIP model for CLIP-features if enabled."""
@@ -267,6 +274,7 @@ class PipelineOrchestrator:
 		# STEP 1: Save data FIRST — guarantee output even if later steps hang
 		self.logger.info("[Shutdown Step 1] Saving data...")
 		self.semantic_update_callback = None  # ROS context invalid during shutdown
+		stored_before_save = self._corrections_stored
 		self._save_all_data()
 
 		# STEP 2: Signal workers to stop, then wait with generous timeout
@@ -293,9 +301,13 @@ class PipelineOrchestrator:
 		# STEP 4: Best-effort drain of remaining corrections (workers now stopped)
 		self.logger.info("[Shutdown Step 4] Draining correction queue...")
 		final_count = self._drain_correction_queue_safe(timeout=3.0)
-		if final_count > 0:
-			self.logger.info(f"[Shutdown Step 4] Drained {final_count} late corrections, saving again...")
+		# Re-save only if corrections arrived after Step 1 started; a redundant
+		# multi-GB save on an unchanged state just races the shutdown watchdog
+		if self._corrections_stored != stored_before_save:
+			self.logger.info(f"[Shutdown Step 4] Drained {final_count} late corrections, saving final state...")
 			self._save_all_data()
+		else:
+			self.logger.info("[Shutdown Step 4] No corrections since Step 1 save; skipping re-save")
 
 		# STEP 5: Diagnostics
 		self.logger.info("[Shutdown Step 5] Running diagnostics...")
@@ -364,6 +376,7 @@ class PipelineOrchestrator:
 
 				correction = self._enrich_correction_with_temporal_data(correction)
 				self.scene_graph_service.store_correction(correction)
+				self._corrections_stored += 1
 				count += 1
 			except queue.Empty:
 				break
@@ -832,6 +845,7 @@ class PipelineOrchestrator:
 
 				# Store enriched correction
 				self.scene_graph_service.store_correction(correction)
+				self._corrections_stored += 1
 
 				# Trigger semantic update callback if set
 				if self.semantic_update_callback and hasattr(correction, 'semantic_id'):
@@ -1252,9 +1266,9 @@ class PipelineOrchestrator:
 			if hasattr(correction, 'selectframe_clip_feature') and correction.selectframe_clip_feature:
 				features.clip_feature = correction.selectframe_clip_feature.tolist() if hasattr(correction.selectframe_clip_feature, 'tolist') else correction.selectframe_clip_feature
 			if hasattr(correction, 'embedding') and correction.embedding is not None:
-				features.semantic_embedding_feature = correction.embedding.tolist() if hasattr(correction.embedding, 'tolist') else correction.embedding
+				features.sentence_embedding_feature = correction.embedding.tolist() if hasattr(correction.embedding, 'tolist') else correction.embedding
 
-			if features.clip_feature or features.semantic_embedding_feature:
+			if features.clip_feature or features.sentence_embedding_feature:
 				update.features[correction.semantic_id] = features
 
 			# Call the callback

@@ -2,6 +2,11 @@
 
 In ./oc-navqa_data.csv, we provide OC-NaVQA the corrected annotations for the NaVQA dataset (see [ReMEmbR](https://github.com/NVIDIA-AI-IOT/remembr)).
 
+Two versions of the annotation file are provided:
+
+- `./oc-navqa_data-legacy.csv`: the annotations used for the experiments in the paper.
+- `./oc-navqa_data.csv`: the current annotations. After the paper's experiments, a number of annotation errors highlighted by the community were fixed and ambiguous questions were disambiguated. Use this version for new experiments; see [EVAL.md](../EVAL.md) for reference numbers on both versions.
+
 The annotations incorporate three major differences:
 
 - They expand the horizon of the questions: the context window is always from the beginning of the sequence until the `current time` .
@@ -14,4 +19,11 @@ To process the data into the remembr `question_jsons`, refer to the script in ou
 
 IMPORTANT: Note that while the NaVQA used the `dense` poses from the CODa dataset, we use the `dense_global` poses, as the ground-truth bounding box annotations in the CODa dataset are defined in the global coordinates.
 
-When using this data, for curtesy please also cite [ReMEmbR](https://arxiv.org/abs/2409.13682), as OC-NaVQA is a derivative of their data with some changes.
+## OC-NaVQA question files
+
+`./oc-navqa/questions/{sequence}/human_qa_fullseq_v2_seconds.json` contains the questions in the form consumed by
+`scripts/eval_navqa.py` (see [EVAL.md](../EVAL.md)), one file per CODa sequence (0, 3, 4, 6, 16, 21, 22; 30 questions each). At evaluation time the question text and the position ground truth are taken from `./oc-navqa_data.csv`, which overrides the JSON. The JSON therefore only supplies the time-related fields and the binary, text, time and duration answers.
+
+## Attribution
+
+When using this data, for courtesy please also cite [ReMEmbR](https://arxiv.org/abs/2409.13682), as OC-NaVQA is a derivative of their data with some changes.

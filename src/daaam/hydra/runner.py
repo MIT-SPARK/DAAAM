@@ -114,6 +114,8 @@ class HydraPipelineRunner:
 			
 		# Update config with output directory and critical paths
 		self.config.output_dir = str(self.output_dir)
+		self.config.scene_graph.hydra_dsg_path = str(self.output_dir / "hydra_output")
+		self.config.scene_graph.defer_dsg_processing = False  # no ROS topic callbacks -> disk load path
 		
 		# Ensure semantic config paths are absolute
 		if not Path(self.config.semantic_config_path).is_absolute():
@@ -358,8 +360,6 @@ class HydraPipelineRunner:
 					if not success:
 						self.logger.warning(f"Hydra failed to process frame {i}")
 				
-				# Process corrections from daaam
-				self._process_corrections()
 				
 				# Update statistics
 				self.stats["frames_processed"] += 1
@@ -458,31 +458,6 @@ class HydraPipelineRunner:
 			self.logging_manager.stop()
 		
 		self.logger.info("Shutdown complete")
-	
-	def _process_corrections(self) -> None:
-		"""Process corrections from daaam and apply to scene graph."""
-		if not hasattr(self.orchestrator, 'correction_queue'):
-			return
-		
-		# Get any pending corrections
-		corrections_processed = 0
-		while True:
-			try:
-				correction = self.orchestrator.correction_queue.get_nowait()
-				
-				# Apply correction through scene graph service
-				if hasattr(self.orchestrator, 'scene_graph_service'):
-					self.orchestrator.scene_graph_service.store_correction(correction)
-					corrections_processed += 1
-					
-			except queue.Empty:
-				break
-			except Exception as e:
-				self.logger.debug(f"Error processing correction: {e}")
-		
-		if corrections_processed > 0:
-			self.stats["corrections_applied"] += corrections_processed
-			self.logger.debug(f"Applied {corrections_processed} corrections")
 	
 	def _compute_final_stats(self) -> None:
 		"""Compute final processing statistics."""

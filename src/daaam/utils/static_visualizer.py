@@ -3,6 +3,7 @@
 """Static DSG Visualizer - Visualize a Dynamic Scene Graph from JSON using Rerun."""
 
 import argparse
+import hashlib
 import numpy as np
 import rerun as rr
 from pathlib import Path
@@ -66,9 +67,9 @@ class StaticDSGVisualizer:
 		# Set default z-offsets for layers
 		default_offsets = {
 			OBJECTS_ID: 0.0,
-			(3, 2): 10.0,  # TRAVERSABILITY layer (layer 3, partition 2)
-			ROOMS_ID: 20.0,
-			BUILDINGS_ID: 40.0,
+			(3, 2): 20.0,  # TRAVERSABILITY layer (layer 3, partition 2)
+			ROOMS_ID: 40.0,
+			BUILDINGS_ID: 80.0,
 			AGENTS_ID: 0.0,
 			10: 0.0,  # GT_OBJECTS
 		}
@@ -186,6 +187,15 @@ class StaticDSGVisualizer:
 
 		# Default fallback
 		return 0.0
+
+	def _get_room_color(self, room_id) -> list:
+		"""Generate a deterministic unique RGB color for a room from its ID."""
+		hash_val = int(hashlib.md5(str(room_id).encode()).hexdigest()[:6], 16)
+		return [
+			(hash_val >> 16) & 0xFF,
+			(hash_val >> 8) & 0xFF,
+			hash_val & 0xFF,
+		]
 
 	def _spatial_downsample_nodes(self, nodes, grid_size=1.0):
 		"""Spatially downsample nodes using grid-based approach.
@@ -424,14 +434,7 @@ class StaticDSGVisualizer:
 			intralayer_edges = data['intralayer_edges']
 			interlayer_edges = data['interlayer_edges']
 
-			# Generate unique color for this region
-			import hashlib
-			hash_val = int(hashlib.md5(str(room_id).encode()).hexdigest()[:6], 16)
-			region_color = [
-				(hash_val >> 16) & 0xFF,
-				(hash_val >> 8) & 0xFF,
-				hash_val & 0xFF
-			]
+			region_color = self._get_room_color(room_id)
 
 			if not trav_nodes:
 				print(f"[REGION_DEBUG] Skipping room {room_id} - no trav nodes", flush=True)
@@ -539,7 +542,7 @@ class StaticDSGVisualizer:
 					edge_colors = [region_color] * len(line_strips)
 					rr.log(
 						f"{base_path}/room_connections",
-						rr.LineStrips3D(line_strips, colors=region_color)
+						rr.LineStrips3D(line_strips, colors=region_color, radii=-0.75)
 					)
 
 			# Log region summary with retention info
@@ -821,18 +824,18 @@ class StaticDSGVisualizer:
 			if source_node.layer == target_node.layer:
 				continue
 
-			# Check if either endpoint is a room
-			source_is_room = edge.source in room_nodes
-			target_is_room = edge.target in room_nodes
+			# Check if either endpoint is a room. Use node.id - NodeSymbol from edge.source/target don't compare correctly.
+			source_is_room = source_node.id in room_nodes
+			target_is_room = target_node.id in room_nodes
 
 			if source_is_room:
-				if edge.source not in room_edges:
-					room_edges[edge.source] = []
-				room_edges[edge.source].append(edge)
+				if source_node.id not in room_edges:
+					room_edges[source_node.id] = []
+				room_edges[source_node.id].append(edge)
 			elif target_is_room:
-				if edge.target not in room_edges:
-					room_edges[edge.target] = []
-				room_edges[edge.target].append(edge)
+				if target_node.id not in room_edges:
+					room_edges[target_node.id] = []
+				room_edges[target_node.id].append(edge)
 			else:
 				unassigned_edges.append(edge)
 
@@ -914,8 +917,8 @@ class StaticDSGVisualizer:
 				rr.LineStrips3D(line_strips)
 			)
 
-	def _log_interlayer_edges_list(self, edges_to_display):
-		"""Log a list of interlayer edges with proper z-offsets."""
+	def _log_interlayer_edges_list(self, edges_to_display, entity_path="world/dsg/edges/interlayer", color=None):
+		"""Log a list of interlayer edges with proper z-offsets and an optional unified color."""
 		interlayer_points = []
 		interlayer_indices_pairs = []
 
@@ -936,12 +939,15 @@ class StaticDSGVisualizer:
 			interlayer_indices_pairs.append([point_idx_start, point_idx_start + 1])
 
 		if interlayer_points:
-			print(f"  Logging {len(interlayer_indices_pairs)} inter-layer edges")
+			print(f"  Logging {len(interlayer_indices_pairs)} inter-layer edges to {entity_path}")
 			line_strips = [
 				[interlayer_points[i], interlayer_points[j]]
 				for i, j in interlayer_indices_pairs
 			]
-			rr.log("world/dsg/edges/interlayer", rr.LineStrips3D(line_strips))
+			if color is not None:
+				rr.log(entity_path, rr.LineStrips3D(line_strips, colors=color, radii=-0.75))
+			else:
+				rr.log(entity_path, rr.LineStrips3D(line_strips, radii=-0.75))
 
 	def _log_dsg_edges(self, edges_to_log, exclude_region_edges=False):
 		"""Log DSG edges with per-room interlayer edge retention.
@@ -1015,33 +1021,30 @@ class StaticDSGVisualizer:
 		# Process intra-layer edges
 		self._log_intra_layer_edges(intra_layer_edges)
 
-		# Process interlayer edges with per-room retention
+		# Process interlayer edges with per-room retention and a unique color per room
 		room_edges, unassigned_edges = self._categorize_interlayer_edges_by_room(interlayer_edges)
 
-		# Collect edges to display
-		edges_to_display = []
-
-		# For each room, ensure at least 10 edges (overrides global subsample)
+		# For each room, ensure at least 10 edges (overrides global subsample) + subsample rest
 		for room_id, edges in room_edges.items():
 			if len(edges) <= 10:
-				edges_to_display.extend(edges)
+				edges_to_display = list(edges)
 				print(f"  Room {room_id}: retaining all {len(edges)} interlayer edges")
 			else:
-				# Keep first 10
-				edges_to_display.extend(edges[:10])
-				print(f"  Room {room_id}: retaining 10 of {len(edges)} interlayer edges")
+				edges_to_display = list(edges[:10])
+				for i in range(10, len(edges)):
+					if (i - 10) % self.interlayer_edge_subsample == 0:
+						edges_to_display.append(edges[i])
+				print(f"  Room {room_id}: retaining {len(edges_to_display)} of {len(edges)} interlayer edges (min 10 + 1/{self.interlayer_edge_subsample} subsample)")
 
-		# Apply global subsample to unassigned edges
-		subsampled_count = 0
-		for i, edge in enumerate(unassigned_edges):
-			if i % self.interlayer_edge_subsample == 0:
-				edges_to_display.append(edge)
-				subsampled_count += 1
+			room_color = self._get_room_color(room_id)
+			room_path = f"world/dsg/edges/interlayer/room_{room_id}"
+			self._log_interlayer_edges_list(edges_to_display, entity_path=room_path, color=room_color)
+
+		# Apply global subsample to unassigned edges (edges not incident on any room)
 		if unassigned_edges:
-			print(f"  Unassigned edges: retaining {subsampled_count} of {len(unassigned_edges)} (subsample 1/{self.interlayer_edge_subsample})")
-
-		# Log the selected interlayer edges
-		self._log_interlayer_edges_list(edges_to_display)
+			subsampled = [edge for i, edge in enumerate(unassigned_edges) if i % self.interlayer_edge_subsample == 0]
+			print(f"  Unassigned edges: retaining {len(subsampled)} of {len(unassigned_edges)} (subsample 1/{self.interlayer_edge_subsample})")
+			self._log_interlayer_edges_list(subsampled, entity_path="world/dsg/edges/interlayer/unassigned")
 	
 	def _log_bounding_boxes(self, entity_path, bboxes, colors, z_offset=0.0):
 		"""Log bounding boxes to Rerun."""
@@ -1224,4 +1227,3 @@ def load_color_map(color_map_path):
 		print(f"Failed to load color map: {e}")
 	
 	return color_map
-

@@ -61,6 +61,7 @@ YAML
 # Build (gtsam is RAM-hungry — use -j2 on <16 GB machines)
 cd ~/ros2_ws
 colcon build --continue-on-error
+# The daaam_ros build also generates config/labels_pseudo.{yaml,csv} (gitignored); no manual step needed.
 
 # Python deps + editable install
 cd ~/ros2_ws/src/daaam
@@ -98,9 +99,15 @@ FastSAM and the BotSort ReID model can be exported to TensorRT `.engine` files f
 
 ### Prerequisites
 
-The PyTorch CUDA version and the TensorRT CUDA version **must match**. If PyTorch is installed with `cu128`, TensorRT must the same version of CUDA that your GPU is running.
+The PyTorch CUDA version and the TensorRT CUDA version **must match**. If PyTorch is installed with `cu128`, TensorRT must also target CUDA 12, which is why [requirements.txt](./requirements.txt) pins `tensorrt-cu12` explicitly:
 
-**Warning:** If you are using a CUDA version other than 12.X or do not intend to use TRT acceleration, adjust the version of `tensorrt-cuXX`in [requirements.txt](./requirements.txt) .
+```bash
+pip install tensorrt-cu12==10.13.3.9
+```
+
+**Warning:** do not add the bare `tensorrt` or `nvidia-tensorrt` meta-packages. They select a CUDA variant rather than providing the module themselves, and on PyPI they now default to `tensorrt_cu13`, which loads CUDA 13 runtime libs alongside PyTorch's CUDA 12 libs. That combination is unsupported by NVIDIA and can cause GPU hangs and system freezes.
+
+If you are using a CUDA version other than 12.X, or do not intend to use TRT acceleration, adjust the `tensorrt-cuXX` requirement accordingly.
 
 Further, the defaults in all launch files in [DAAAM-ROS](https://github.com/MIT-SPARK/DAAAM-ROS/tree/main/launch) are set to `.engine` files. if you intend to use standard `.pt` models, adapt the launch files. 
 
@@ -130,6 +137,21 @@ tracking:
 ```
 
 When using `.pt` files instead (no TensorRT), the code auto-detects the backend from the file extension — no other changes needed.
+
+### Obtaining the base weights
+
+`checkpoints/` is not tracked in git, so a fresh clone contains no model weights. The FastSAM
+checkpoint must be present before the first run: the loader resolves the configured path and
+raises `FileNotFoundError` if it is missing, rather than falling back to an automatic download.
+Fetch the FastSAM weights from the [upstream release](https://github.com/CASIA-IVA-Lab/FastSAM)
+and place them at the path the config expects, e.g.:
+
+```
+checkpoints/fastsam/FastSAM-x.pt
+```
+
+Paths in `config/pipeline_config.yaml` and the launch files are relative to `checkpoints/`, so
+`model_name: "fastsam/FastSAM-x.pt"` resolves to `checkpoints/fastsam/FastSAM-x.pt`.
 
 ## Optional: GLPK for Assignment Optimization
 

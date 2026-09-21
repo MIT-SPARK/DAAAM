@@ -116,4 +116,4 @@ The pipeline uses a structured configuration system (`PipelineConfig` in `src/da
 | **FastSAM** | `FastSAM-s.pt`, `FastSAM-x.pt` (+ TensorRT `.engine` exports) |
 | **SAM2** | `sam2.1_hiera_base_plus`, `sam2.1_hiera_large`, etc. |
 | **DAM** | Describe Anything Model via `dam_multi_image` worker |
-| **Sentence Embeddings** | Any SentenceTransformers-compatible model (default: `sentence-t5-large`) |
+| **Sentence Embeddings** | Any SentenceTransformers-compatible model (default: `sentence-t5-xl`) |

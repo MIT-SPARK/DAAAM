@@ -4,7 +4,7 @@ import click
 import yaml
 from pathlib import Path
 
-from daaam.utils.embedding import SentenceEmbeddingHandler
+from daaam.utils.embedding import SentenceEmbeddingHandler, EncoderProvenance, stamp_embedding_provenance
 
 
 @click.command()
@@ -28,7 +28,25 @@ def main(data_dir: str, sentence_model_name: str):
     if background_objects_path.exists():
         with open(background_objects_path, 'r') as f:
             background_objects = yaml.safe_load(f)
-        print(f"Loaded {len(background_objects.get('objects', []))} background objects")
+        # yaml.safe_load returns None on an empty file (happens when the
+        # upstream DAAAM run was interrupted before flushing background_objects).
+        if background_objects is None:
+            background_objects = {}
+            print(f"WARN: {background_objects_path} is empty; treating as no background objects")
+        else:
+            print(f"Loaded {len(background_objects.get('objects', []))} background objects")
+
+        # Drop entries truncated by an interrupted shutdown (last write may
+        # have flushed only part of the dict's keys).
+        required_keys = {'semantic_id', 'position_world', 'position_camera',
+                         'centroid_pixel', 'median_depth', 'observations'}
+        all_objs = background_objects.get('objects', [])
+        background_objects['objects'] = [
+            o for o in all_objs if required_keys.issubset(o.keys())
+        ]
+        dropped = len(all_objs) - len(background_objects['objects'])
+        if dropped:
+            print(f"Skipped {dropped} truncated background_objects entries (missing required keys)")
 
         # Create BACKGROUND_OBJECTS layer if it doesn't exist
         if not scene_graph.has_layer("BACKGROUND_OBJECTS") and 'objects' in background_objects:
@@ -133,6 +151,15 @@ def main(data_dir: str, sentence_model_name: str):
         sg_metadata["features"][sem_idx] = features
 
     scene_graph.metadata.set(sg_metadata)
+
+    stamp_embedding_provenance(
+        scene_graph,
+        sentence=EncoderProvenance(
+            model_name=sentence_model_name,
+            backend="sentence_transformers",
+            dim=handler.embedding_dim,
+        ),
+    )
 
     updated_path = str(sg_path).replace('.json', '_updated.json')
     scene_graph.save(updated_path)

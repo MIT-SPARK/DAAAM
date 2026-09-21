@@ -18,7 +18,7 @@ class ToolConfig:
 	temporal_window_size: float = 50.0  # Time window size in seconds for temporal filtering in filter_then_rank mode
 	
 	# Semantic search parameters
-	sentence_embedding_model_name: str = "sentence-transformers/sentence-t5-large"  # SentenceTransformer model for text embeddings
+	sentence_embedding_model_name: str = "sentence-transformers/sentence-t5-xl"  # SentenceTransformer model for text embeddings
 	clip_model_name: Optional[str] = "ViT-L-14"  # Optional CLIP model 
 	clip_backend: Optional[str] = "openai"  # Backend for CLIP model (e.g., open_clip, clip)
 	clip_weight: float = 0.5  # Weight for CLIP embeddings in combined scoring
@@ -42,14 +42,18 @@ class ToolConfig:
 	# Regions:
 	in_region_threshold: float = 4.0 # Distance in meters to consider the robot "in" a region
 
-	default_top_k: int = 20  # Default number of results to return for tools
+	default_top_k: int = 30  # Default number of results to return for tools
 	default_spatial_radius: float = 5.0  # Default radius for spatial searches in tools
 	trajectory_sample_points: int = 10  # Number of trajectory points to sample in get_agent_trajectory_information
 
 	min_radius = 5.0 # Minimum radius for get_objects_in_radius
 	max_radius = 15.0 # Maximum radius for get_objects_in_radius
 
-	otsu_prefilter_percentile: float = 85.0  # Percentile for Otsu pre-filter (higher = tighter pool, e.g. 90 = top 10%)
+	# Percentile for Otsu pre-filter (higher = tighter pool, e.g. 90 = top 10%).
+	# Lowered from 85 to 60 so multi-instance "nearest X" queries (when there are
+	# many same-class objects) admit the right cluster into the candidate pool;
+	# Otsu still narrows to the actual matches before distance ranking.
+	otsu_prefilter_percentile: float = 60.0
 
 @dataclass
 class SceneUnderstandingConfig:

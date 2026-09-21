@@ -150,16 +150,33 @@ Key launch arguments:
 | `depth_lb` | `0.05` | Minimum valid depth (m) |
 | `depth_ub` | `20.0` | Maximum valid depth (m) |
 | `exit_after_clock` | `true` | Shut down when bag finishes |
+| `cuda_device` | *(inherit env)* | CUDA device for the grounding workers, e.g. `1` (sets `CUDA_VISIBLE_DEVICES` for them) |
+
+Bag playback robustness is governed by node and Hydra parameters rather than launch arguments:
+`input_queue_size` (default `100`, in `daaam_node.launch.yaml`) sizes the RGB/depth subscribers and
+synchronizer so short processing stalls do not drop frames; the Hydra receiver uses the matching
+`queue_size: 100` in `config/hydra_ros_config/coda_dataset_input_config.yaml`;
+`backend.min_dsg_separation_s: 5.0` in `config/hydra_config/coda_dataset_khronos.yaml` throttles the
+intermediate scene-graph publishes; `shutdown_timeout_s` (default `300`) bounds the shutdown watchdog
+so that saving a large scene graph on long sequences is never cut short.
 
 ## 5. Running without ROS 2
 
 !WARNING! This can be brittle and is not the preferred option of running the pipeline as the hydra python bindings are less actively maintained. If there are errors, please try to use the ROS2 [DAAAM-ROS](https://github.com/MIT-SPARK/DAAAM-ROS) interface.
 
+This path additionally requires the `hydra_python` bindings, which are built as part of the
+colcon workspace (see [INSTALL.md](./INSTALL.md)) and are not installed by `requirements.txt`.
+Source the workspace before running, or the pipeline starts up and then processes zero frames.
+
+The Hydra configs live in [DAAAM-ROS](https://github.com/MIT-SPARK/DAAAM-ROS/tree/main/config/hydra_config),
+not in this repository, so `--hydra-config-path` must point at that checkout (or at the installed
+`share/daaam_ros/config/hydra_config/` directory). It takes a full path, not a bare config name.
+
 The standalone pipeline script reads image sequences or rosbags directly:
 
 ```bash
 python scripts/run_pipeline.py /path/to/dataset \
-  --hydra-config coda_dataset_khronos \
+  --hydra-config-path /path/to/daaam_ros/config/hydra_config/coda_dataset_khronos.yaml \
   --dataset-type ImageSequenceDataset \
   --target-fps 10 \
   --output-dir output/my_run
@@ -173,9 +190,9 @@ Key CLI arguments:
 | `--config` | `config/pipeline_config.yaml` | Pipeline config file |
 | `--config-overrides` | | Key=value overrides (e.g. `workers.num_grounding_workers=8`) |
 | `--dataset-type` | `ImageSequenceDataset` | Dataset loader class |
-| `--hydra-config-path` | `coda_dataset_khronos.yaml` | Hydra integration config |
+| `--hydra-config-path` | *(placeholder, must be set)* | Full path to a Hydra config YAML, shipped in DAAAM-ROS |
 | `--sam-model` | `fastsam/FastSAM-s.pt` | SAM model path |
-| `--sentence-embedding-model` | `sentence-transformers/sentence-t5-large` | Embedding model for post-processing |
+| `--sentence-embedding-model` | `sentence-transformers/sentence-t5-xl` | Embedding model for post-processing |
 | `--target-fps` | | Target processing framerate |
 | `--max-frames` | | Maximum frames to process |
 | `--depth-scale` | `1.0` | Depth scale factor |
@@ -217,10 +234,14 @@ This will read from the `dsg_updated.json` file and save `clustered_dsg.json` .
 
 Generate LLM-based natural language summaries for room/region nodes:
 
+The OpenAI client reads the key from the environment, so export it first (a `.env` file in the
+repository root also works):
+
 ```bash
+export OPENAI_API_KEY=sk-...
+
 python scripts/summarize_regions.py \
   --data-dir output/my_run \
-  --openai-api-key $OPENAI_API_KEY \
   --model-name gpt-5-nano \
   --n-samples 20
 ```
@@ -246,8 +267,10 @@ python scripts/run_static_visualizer.py \
 | `--log-object-meshes` | `false` | Log individual object meshes |
 | `--spawn` / `--no-spawn` | `--spawn` | Open Rerun viewer automatically |
 | `--z-offset-objects` | `0.0` | Z offset for object layer |
-| `--z-offset-places` | `10.0` | Z offset for places layer |
-| `--z-offset-rooms` | `20.0` | Z offset for rooms layer |
+| `--z-offset-places` | `20.0` | Z offset for places/traversability layer |
+| `--z-offset-rooms` | `40.0` | Z offset for rooms layer |
+| `--z-offset-buildings` | `80.0` | Z offset for buildings layer |
+| `--z-offset-gt` | `0.0` | Z offset for ground truth objects |
 
 ## 8. Pipeline Outputs
 

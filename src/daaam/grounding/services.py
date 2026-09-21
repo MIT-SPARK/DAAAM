@@ -1,5 +1,6 @@
 from typing import Optional, Dict, List, Any
 import multiprocessing as mp
+import os
 from multiprocessing.synchronize import Event
 import threading
 import queue
@@ -54,9 +55,15 @@ class GroundingService:
 		if log_dir:
 			worker_config['log_dir'] = log_dir
 
-		# Propagate CUDA device selection to worker subprocess
+		# Propagate CUDA device selection to worker subprocess. Children are spawned, so
+		# they inherit os.environ at exec time: the variable has to be set here, in the
+		# parent, before start(). Setting it inside the child (GroundingWorker.__init__)
+		# is too late, because torch caches the visible devices during the module
+		# imports that run before __init__, and the worker then binds to whatever
+		# device the parent's environment happened to name.
 		if hasattr(pipeline_config, 'grounding') and pipeline_config.grounding.cuda_device is not None:
 			worker_config['cuda_device'] = str(pipeline_config.grounding.cuda_device)
+			os.environ['CUDA_VISIBLE_DEVICES'] = worker_config['cuda_device']
 			
 		# Add color_map to worker config if provided
 		if color_map:

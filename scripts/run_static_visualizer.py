@@ -3,8 +3,10 @@
 """Static DSG Visualizer - Visualize a Dynamic Scene Graph from JSON using Rerun."""
 
 import argparse
+import inspect
 import numpy as np
 import rerun as rr
+import rerun.blueprint as rrb
 from pathlib import Path
 import textwrap
 import traceback
@@ -47,6 +49,19 @@ LAYER_COLORS = {
 	AGENTS_ID: [255, 0, 255],
 }
 
+def _assert_eye_controls_available(spin_speed):
+	"""Fail fast with upgrade guidance if the installed rerun-sdk lacks orbital-spin blueprint support."""
+	upgrade_hint = "pip install -U 'rerun-sdk'"
+	assert hasattr(rrb, "EyeControls3D") and hasattr(rrb, "Eye3DKind"), (
+		f"--spin-speed={spin_speed} needs rerun-sdk eye-controls support "
+		f"(EyeControls3D added in 0.24.0; spin_speed field present in 0.33.0). "
+		f"Installed rerun-sdk is {rr.__version__}. Upgrade in the cv env: {upgrade_hint}"
+	)
+	assert "spin_speed" in inspect.signature(rrb.EyeControls3D.__init__).parameters, (
+		f"Installed rerun-sdk {rr.__version__} has EyeControls3D but no 'spin_speed' field "
+		f"(added in a later release, present in 0.33.0). Upgrade in the cv env: {upgrade_hint}"
+	)
+
 def parse_arguments():
 	parser = argparse.ArgumentParser(
 		description="Visualize a Dynamic Scene Graph from JSON using Rerun",
@@ -62,7 +77,7 @@ def parse_arguments():
 		"--color-map",
 		type=str,
 		default="/path/to/daaam_ros/config/labels_pseudo.csv",
-		help="Path to the color map CSV file (optional)"
+		help="Path to the color map CSV file"
 	)
 	parser.add_argument(
 		"--gt-dsgs",
@@ -96,20 +111,20 @@ def parse_arguments():
 	parser.add_argument(
 		"--z-offset-places",
 		type=float,
-		default=10.0,
-		help="Z-offset for places/traversability layer in meters (default: 10.0)"
+		default=20.0,
+		help="Z-offset for places/traversability layer in meters (default: 20.0)"
 	)
 	parser.add_argument(
 		"--z-offset-rooms",
 		type=float,
-		default=20.0,
-		help="Z-offset for rooms layer in meters (default: 20.0)"
+		default=40.0,
+		help="Z-offset for rooms layer in meters (default: 40.0)"
 	)
 	parser.add_argument(
 		"--z-offset-buildings",
 		type=float,
-		default=40.0,
-		help="Z-offset for buildings layer in meters (default: 40.0)"
+		default=80.0,
+		help="Z-offset for buildings layer in meters (default: 80.0)"
 	)
 	parser.add_argument(
 		"--z-offset-gt",
@@ -134,6 +149,13 @@ def parse_arguments():
 		action="store_true",
 		default=False,
 		help="Log each region (room + traversability) to separate entity paths for independent coloring"
+	)
+	parser.add_argument(
+		"--spin-speed",
+		type=float,
+		default=0.0,
+		help="Orbital auto-spin speed of the 3D viewer camera in radians/second around the eye-up axis "
+			 "(default: 0.0 = no spin; e.g. 0.2 ~ one revolution every ~31s). Requires rerun-sdk >= 0.33."
 	)
 
 	args = parser.parse_args()
@@ -171,7 +193,22 @@ def main():
 		log_regions_separately=args.log_regions_separately
 	)
 	visualizer.visualize()
-	
+
+	# Configure orbital auto-spin of the viewer camera (opt-in; preserves default behavior when 0.0)
+	if args.spin_speed != 0.0:
+		_assert_eye_controls_available(args.spin_speed)
+		blueprint = rrb.Blueprint(
+			rrb.Spatial3DView(
+				origin="/world",
+				eye_controls=rrb.EyeControls3D(
+					kind=rrb.Eye3DKind.Orbital,
+					spin_speed=args.spin_speed,
+				),
+			)
+		)
+		rr.send_blueprint(blueprint)
+		print(f"Orbital auto-spin enabled: {args.spin_speed} rad/s")
+
 	# Keep the script running if spawned
 	if args.spawn:
 		print("\nVisualization ready. Press Ctrl+C to exit.")

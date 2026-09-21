@@ -30,7 +30,7 @@ class GroundingConfig:
 	agent_model_name: str = "gpt-4.1"
 	group_prompt_file: str = "config/prompt_templates/grounded_sam_prompt.txt"
 	query_interval_frames: int = 60
-	sentence_embedding_model: str = "sentence-transformers/sentence-t5-large"
+	sentence_embedding_model: str = "sentence-transformers/sentence-t5-xl"
 	enable_perframe_clip_features: bool = True
 	clip_feature_interval_frames: int = 5
 	perframe_clip_model_name: str = "ViT-B-16"
@@ -110,6 +110,7 @@ class SceneGraphConfig:
 	"""Configuration for scene graph service."""
 	defer_dsg_processing: bool = False  # Defer DSG processing until shutdown for performance
 	enable_background_objects: bool = True  # Enable tracking of all objects including those filtered by Hydra
+	hydra_dsg_path: str = ""  # Path to Hydra's output directory; loads <path>/backend/dsg.json at shutdown
 
 
 @dataclass

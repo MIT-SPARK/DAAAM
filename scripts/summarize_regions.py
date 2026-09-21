@@ -375,7 +375,9 @@ def main(data_dir: str, model_name: str, n_samples: int, feature_key: str, scene
 	objs_by_region, _, bg_objs_by_region = objects_by_region(scene_graph)
 
 	print(f"Loaded scene graph with {scene_graph.num_nodes()} nodes")
-	print(f"Found {len(objs_by_region)} regions")
+	print(f"Found {len(set(objs_by_region.keys()) | set(bg_objs_by_region.keys()))} regions "
+		  f"({len(objs_by_region)} with foreground objects, "
+		  f"{len(bg_objs_by_region)} with background objects)")
 	if feature_key == 'combined':
 		print(f"Note: Using concatenated clip_feature + sentence_embedding_feature from scene_graph.metadata")
 	else:
@@ -482,7 +484,7 @@ def main(data_dir: str, model_name: str, n_samples: int, feature_key: str, scene
 
 		print(f"\nSaved {len(region_summaries)} region summaries to {output_path}")
 
-	print(f"\nCompleted: {len(region_summaries)}/{len(objs_by_region)} regions successfully summarized")
+	print(f"\nCompleted: {len(region_summaries)}/{len(all_region_ids)} regions successfully summarized")
 
 if __name__ == "__main__":
 	main()
