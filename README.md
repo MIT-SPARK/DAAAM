@@ -24,14 +24,12 @@ If you use this code in your work, please cite the following paper:
 Nicolas Gorlo, Lukas Schmid, and Luca Carlone, "**Describe Anything, Anywhere, at Any Moment**". *arXiv preprint arXiv:2512.00565*, 2025.
 
 ```bibtex
-@article{Gorlo2025DAAAM,
-      title={Describe Anything Anywhere At Any Moment},
-      author={Nicolas Gorlo and Lukas Schmid and Luca Carlone},
-      year={2025},
-      eprint={2512.00565},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2512.00565}
+@inproceedings{Gorlo26cvpr-DAAAM,
+      title={Describe anything anywhere at any moment},
+      author={Gorlo, Nicolas and Schmid, Lukas and Carlone, Luca},
+      booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+      pages={35002--35013},
+      year={2026}
 }
 ```
 
