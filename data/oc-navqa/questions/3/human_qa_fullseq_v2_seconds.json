@@ -1,0 +1,683 @@
+{
+  "version": 0.1,
+  "data": [
+    {
+      "id": "3_LONG_82d00865-87f5-4e45-aa02-ecda9eec12ae",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1447.3892230987549,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987133.602156,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1447.39 seconds from start and you are located at [-0.24, -0.58, -0.2]. \n When did I last see an \"EMERGENCY EXIT ONLY\" marker?",
+      "type": "time",
+      "current_time": 1673987133.602156,
+      "answers": {
+        "text": [
+          "9.43 minutes ago"
+        ],
+        "time": 9.43
+      }
+    },
+    {
+      "id": "3_LONG_e9c21145-3a55-41a6-b48f-e8d0b1452fb3",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1418.5331342220306,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987104.746067,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1418.53 seconds from start and you are located at [2.1, 16.27, -0.46]. \n Did I see red sofas with people sitting on them?",
+      "type": "binary",
+      "current_time": 1673987104.746067,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_LONG_d7732615-983f-4dc0-8c52-1437b98b98ed",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1109.0048384666443,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986795.2177713,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1109.00 seconds from start and you are located at [-45.54, 190.43, -0.78]. \n Did I go outdoor with trees?",
+      "type": "binary",
+      "current_time": 1673986795.2177713,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_LONG_3a877fd4-beaf-4f2f-b1dc-9d461707dd2d",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1147.8575432300568,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986834.070476,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1147.86 seconds from start and you are located at [-46.94, 175.21, -1.09]. \n Where did I see a horse sculpture?",
+      "type": "position",
+      "current_time": 1673986834.070476,
+      "answers": {
+        "position": [
+          -100.1460955,
+          163.9716075,
+          -2.164236
+        ],
+        "timestamp_with_answer": 1673986634.0
+      }
+    },
+    {
+      "id": "3_LONG_73204feb-ee1c-4567-a836-fe2db05bfb23",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1421.5332262516022,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987107.746159,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1421.53 seconds from start and you are located at [2.48, 13.43, -0.42]. \n Where did I see over 5 tables with people chatting there?",
+      "type": "position",
+      "current_time": 1673987107.746159,
+      "answers": {
+        "position": [
+          -96.986878,
+          202.5529555,
+          -1.6209574999999998
+        ],
+        "timestamp_with_answer": 1673986700.0
+      }
+    },
+    {
+      "id": "3_LONG_fda7eae1-1531-42b5-be38-ed48540060a2",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1415.532676935196,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987101.7456098,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1415.53 seconds from start and you are located at [1.85, 19.07, -0.49]. \n When did you last see over 10 bikes?",
+      "type": "time",
+      "current_time": 1673987101.7456098,
+      "answers": {
+        "text": [
+          "0.86 minutes ago"
+        ],
+        "time": 0.86
+      }
+    },
+    {
+      "id": "3_LONG_cd5d197f-b393-443e-8531-6e04ad2fe37d",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1163.2089626789093,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986849.4218955,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1163.21 seconds from start and you are located at [-48.46, 162.01, -1.36]. \n when did you exit the first building?",
+      "type": "time",
+      "current_time": 1673986849.4218955,
+      "answers": {
+        "text": [
+          "8.71 minutes ago"
+        ],
+        "time": 8.71
+      }
+    },
+    {
+      "id": "3_LONG_3c7ff5ee-ef38-4096-8ee6-9d9feaf9e9b2",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1130.205893278122,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986816.418826,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1130.21 seconds from start and you are located at [-46.61, 188.79, -0.82]. \n did you see a car trying to park?",
+      "type": "binary",
+      "current_time": 1673986816.418826,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_LONG_5213d6a7-151d-4beb-b9c3-4321c5fd59b8",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1415.532676935196,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987101.7456098,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1415.53 seconds from start and you are located at [1.85, 19.07, -0.49]. \n Did you see a person holding a door for you to enter the building?",
+      "type": "binary",
+      "current_time": 1673987101.7456098,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_LONG_84d8f2e1-734c-421b-8822-681b17756920",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1292.5208287239075,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986978.7337615,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1292.52 seconds from start and you are located at [-54.71, 89.88, -1.98]. \n Did you see the stairs inside the building?",
+      "type": "binary",
+      "current_time": 1673986978.7337615,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_MEDIUM_bdb7c7ea-7e73-4565-9198-e10dfe218646",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1214.4138355255127,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986900.6267684,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1214.41 seconds from start and you are located at [-49.89, 137.59, -1.56]. \n Where did you see the stairs in the building?",
+      "type": "position",
+      "current_time": 1673986900.6267684,
+      "answers": {
+        "position": [
+          -99.380544,
+          201.1907025,
+          -1.6650105
+        ],
+        "timestamp_with_answer": 1673986678.0
+      }
+    },
+    {
+      "id": "3_MEDIUM_66435c41-e1c6-47b2-93c4-f4468f30dc18",
+      "length_category": "FULL_SEQUENCE",
+      "length": 486.5962116718292,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986172.8091445,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 486.60 seconds from start and you are located at [-84.5, 201.04, -1.61]. \n Are you in the building?",
+      "type": "binary",
+      "current_time": 1673986172.8091445,
+      "answers": {
+        "text": [
+          "No",
+          "No"
+        ]
+      }
+    },
+    {
+      "id": "3_MEDIUM_5a271ce5-912d-4e28-9140-bb9921444f6f",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1286.4706559181213,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986972.6835887,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1286.47 seconds from start and you are located at [-53.4, 92.89, -1.93]. \n What's the color of the sculpture of the horse",
+      "type": "text",
+      "current_time": 1673986972.6835887,
+      "answers": {
+        "text": [
+          "Brown"
+        ]
+      }
+    },
+    {
+      "id": "3_MEDIUM_598bd41e-8344-4d07-b894-fc1a39d4da6b",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1376.529795408249,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987062.7427282,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1376.53 seconds from start and you are located at [-22.27, 40.52, -1.51]. \n How many motor vehicles did you see in total?",
+      "type": "text",
+      "current_time": 1673987062.7427282,
+      "answers": {
+        "text": [
+          "18"
+        ]
+      }
+    },
+    {
+      "id": "3_MEDIUM_2d60058c-1488-43dd-847c-d40bc1e2859f",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1358.5280449390411,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987044.7409778,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1358.53 seconds from start and you are located at [-39.31, 42.2, -1.89]. \n Where did you last see a big wall art?",
+      "type": "position",
+      "current_time": 1673987044.7409778,
+      "answers": {
+        "position": [
+          -100.1460955,
+          163.9716075,
+          -2.164236
+        ],
+        "timestamp_with_answer": 1673986636.0
+      }
+    },
+    {
+      "id": "3_MEDIUM_042f8517-6875-4364-accd-3096e1032efe",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1003.0062711238861,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986689.219204,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1003.01 seconds from start and you are located at [-98.16, 201.58, -1.64]. \n Did the women who opened the door for you also carry a water bottle?",
+      "type": "binary",
+      "current_time": 1673986689.219204,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_MEDIUM_2d2b8344-6797-4a57-91c3-2efd1c43f517",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1433.633846282959,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987119.846779,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1433.63 seconds from start and you are located at [1.84, 2.68, -0.35]. \n Where did you last leave the building?",
+      "type": "position",
+      "current_time": 1673987119.846779,
+      "answers": {
+        "position": [
+          -85.8207905,
+          205.21381,
+          -1.5187205000000001
+        ],
+        "timestamp_with_answer": 1673986729.0
+      }
+    },
+    {
+      "id": "3_MEDIUM_63f85e28-3f42-4aa6-bd96-21a414394ccf",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1142.9568691253662,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986829.169802,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1142.96 seconds from start and you are located at [-46.6, 178.07, -1.04]. \n When did you leave the building?",
+      "type": "time",
+      "current_time": 1673986829.169802,
+      "answers": {
+        "text": [
+          "1.67 minutes ago"
+        ],
+        "time": 1.67
+      }
+    },
+    {
+      "id": "3_MEDIUM_ebc073aa-6f34-4206-9968-5e2f01fbbd2d",
+      "length_category": "FULL_SEQUENCE",
+      "length": 884.9843351840973,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986571.197268,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 884.98 seconds from start and you are located at [-105.26, 109.3, -3.3]. \n Did you see a building with blue glass wall?",
+      "type": "binary",
+      "current_time": 1673986571.197268,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_MEDIUM_799afe7b-9226-4097-b14d-9cb91dee7a7d",
+      "length_category": "FULL_SEQUENCE",
+      "length": 642.1069166660309,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986328.3198495,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 642.11 seconds from start and you are located at [-105.16, 113.26, -3.14]. \n Did you see a big plant in the building?",
+      "type": "binary",
+      "current_time": 1673986328.3198495,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_SHORT_81b4e8bd-348a-4326-a3df-b84a4a422b0e",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1451.7396252155304,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987137.952558,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1451.74 seconds from start and you are located at [0.29, -0.1, -0.16]. \n Where did you see a parked van?",
+      "type": "position",
+      "current_time": 1673987137.952558,
+      "answers": {
+        "position": [
+          1.848926,
+          19.066000000000003,
+          -0.48538950000000003
+        ],
+        "timestamp_with_answer": 1673987102.0
+      }
+    },
+    {
+      "id": "3_SHORT_ced58d98-c284-46ff-9a38-1e8312c7e486",
+      "length_category": "FULL_SEQUENCE",
+      "length": 788.8740525245667,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986475.0869853,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 788.87 seconds from start and you are located at [-56.66, 93.61, -1.99]. \n Did you see the back of a stop sign?",
+      "type": "binary",
+      "current_time": 1673986475.0869853,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_SHORT_8aa1186d-ad47-4a1d-8068-73efdc21d309",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1382.5303936004639,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987068.7433264,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1382.53 seconds from start and you are located at [-16.55, 40.01, -1.39]. \n Where did you see the yellow bollards?",
+      "type": "position",
+      "current_time": 1673987068.7433264,
+      "answers": {
+        "position": [
+          -55.823389500000005,
+          59.212178,
+          -2.1683665000000003
+        ],
+        "timestamp_with_answer": 1673987013.0
+      }
+    },
+    {
+      "id": "3_SHORT_f27644fc-85ac-4182-a4c8-619972564e25",
+      "length_category": "FULL_SEQUENCE",
+      "length": 210.31945419311523,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673985896.532387,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 210.32 seconds from start and you are located at [-51.04, 126.7, -1.65]. \n Did you see the trash can?",
+      "type": "binary",
+      "current_time": 1673985896.532387,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_SHORT_a2be310a-5f69-416f-9aed-3c7d2d2b176c",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1136.206340789795,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986822.4192736,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1136.21 seconds from start and you are located at [-46.31, 183.76, -0.92]. \n Did you see a person wearing pink shoe?",
+      "type": "binary",
+      "current_time": 1673986822.4192736,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_SHORT_55634471-144f-4470-8354-82f0f2c69842",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1178.2103583812714,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986864.4232912,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1178.21 seconds from start and you are located at [-47.93, 160.78, -1.39]. \n Where did you see a blue truck?",
+      "type": "position",
+      "current_time": 1673986864.4232912,
+      "answers": {
+        "position": [
+          -49.510175000000004,
+          160.99575149999998,
+          -1.392011
+        ],
+        "timestamp_with_answer": 1673986852.0
+      }
+    },
+    {
+      "id": "3_SHORT_1f6e9770-3d38-40bf-aff0-48fbc321e57c",
+      "length_category": "FULL_SEQUENCE",
+      "length": 225.321049451828,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673985911.5339823,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 225.32 seconds from start and you are located at [-49.69, 141.04, -1.55]. \n Did you see a person go down the stairs?",
+      "type": "binary",
+      "current_time": 1673985911.5339823,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    },
+    {
+      "id": "3_SHORT_50661793-596b-4c1f-b07e-f312bbbaf3db",
+      "length_category": "FULL_SEQUENCE",
+      "length": 1445.739149093628,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673987131.952082,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 1445.74 seconds from start and you are located at [-0.24, -0.58, -0.2]. \n Where did you see a motocycle?",
+      "type": "position",
+      "current_time": 1673987131.952082,
+      "answers": {
+        "position": [
+          2.6134335,
+          7.789251,
+          -0.363182
+        ],
+        "timestamp_with_answer": 1673987115.0
+      }
+    },
+    {
+      "id": "3_SHORT_2dbd306e-1a72-4c69-9a02-e88f13fe33a8",
+      "length_category": "FULL_SEQUENCE",
+      "length": 851.9810087680817,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986538.1939416,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 851.98 seconds from start and you are located at [-105.31, 106.82, -3.37]. \n Where did you see an emergency phone call location?",
+      "type": "position",
+      "current_time": 1673986538.1939416,
+      "answers": {
+        "position": [
+          -62.2260425,
+          93.4103165,
+          -1.934289
+        ],
+        "timestamp_with_answer": 1673986482.0
+      }
+    },
+    {
+      "id": "3_SHORT_ed96bd25-71fd-4dc7-bdb3-90c5341a9198",
+      "length_category": "FULL_SEQUENCE",
+      "length": 866.982540845871,
+      "start_time": 1673985686.2129328,
+      "end_time": 1673986553.1954737,
+      "file_info": {
+        "qa_start_filename": "1673985684.762776.pkl",
+        "qa_end_filename": "1673987151.700181.pkl",
+        "context_start_filename": "1673985684.762776.pkl",
+        "context_end_filename": "1673987151.700181.pkl"
+      },
+      "question": "The current time is 866.98 seconds from start and you are located at [-105.25, 109.17, -3.31]. \n Did you stop in front of the building?",
+      "type": "binary",
+      "current_time": 1673986553.1954737,
+      "answers": {
+        "text": [
+          "Yes",
+          "Yes"
+        ]
+      }
+    }
+  ]
+}

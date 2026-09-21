@@ -158,3 +158,4 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 osnet_x0_25_msmt17.pt
+.vscode/settings.json
